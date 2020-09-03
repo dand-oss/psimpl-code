@@ -31,7 +31,8 @@
     http://sourceforge.net/projects/psimpl/
 */
 
-#include "../lib/psimpl.h"
+#include "psimpl.h"
+// cheat!
 #include "../demo/psimpl_reference.h"
 #include "prev/psimpl.h"
 #include "cycle_p.h"
@@ -40,12 +41,12 @@
 #include <vector>
 #include <deque>
 #include <list>
-#include <QtCore/QDirIterator>
-#include <QtCore/QFileInfo>
-#include <QtCore/QStringList>
-#include <QtCore/QPair>
-#include <QtCore/QVector>
-#include <QtCore/QTextStream>
+#include <QDirIterator>
+#include <QFileInfo>
+#include <QStringList>
+#include <QPair>
+#include <QVector>
+#include <QTextStream>
 
 
 typedef QPair <QString, QStringList> Setting;

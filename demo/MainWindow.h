@@ -35,7 +35,7 @@
 #define MAINWINDOW_H
 
 
-#include <QtGui/QMainWindow>
+#include <QMainWindow>
 
 
 namespace Ui {

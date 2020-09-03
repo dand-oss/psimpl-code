@@ -36,9 +36,9 @@
 #include "DPWorker.h"
 #include <cmath>
 #include <limits>
-#include <QtCore/QTextStream>
-#include <QtGui/QToolButton>
-#include <QtGui/QFileDialog>
+#include <QTextStream>
+#include <QToolButton>
+#include <QFileDialog>
 
 
 namespace psimpl {
