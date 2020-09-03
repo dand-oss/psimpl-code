@@ -1,0 +1,141 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="Content-Type">
+  <meta name="description" content="Opheim algorithm for polyline simplification">
+  <meta name="keywords" content="Opheim, algorithm, psimpl, polyline, simplification, library, c++, simplify, reduce, decimate, approximate">
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <title>psimpl - Opheim simplification</title>
+</head>
+<body>
+<div id="main_container">
+    <div id="header">
+        <div id="title"><h1>psimpl</h1></div>
+        <div id="sub_title"><h2>generic n-dimensional poyline simplification</h2></div>
+        <div id="nav">
+            <a title="Home" href="index.html">Home</a>
+            <a title="News" href="news.html">News</a>
+            <a title="Documentation" href="documentation.html">Documentation</a>
+            <a title="Downloads" href="downloads.html">Download</a>
+        </div>
+    </div>
+    <div id="sidebar">
+        <div>
+            <span>Simplification:</span>
+            <ul>
+                <li><a title="Nth Point" href="nth-point.html">Nth Point</a></li>
+                <li><a title="Radial Distance" href="radial-distance.html">Radial Distance</a></li>
+                <li><a title="Perpendicular Distance" href="perpendicular-distance.html">Perpendicular Distance</a></li>
+                <li><a title="Reumann-Witkam" href="reumann-witkam.html">Reumann-Witkam</a></li>
+                <li><a title="Opheim" href="opheim.html">Opheim</a></li>
+                <li><a title="Lang" href="lang.html">Lang</a></li>
+                <li><a title="Douglas-Peucker" href="douglas-peucker.html">Douglas-Peucker</a></li>
+            </ul>
+        </div>
+        <div>
+            <span>Errors:</span>
+            <ul>
+                <li><a title="Positional Errors" href="positional-errors.html">Positional</a></li>
+            </ul>
+        </div>
+    </div>
+    <div id="content">
+    
+<h1>Opheim</h1>
+
+<p>The O(n) <b class="algo">Opheim</b> routine is very similar to the
+<b class="algo">Reumann-Witkam</b> routine, and can be seen as a constrained
+version of that <b class="algo">Reumann-Witkam</b> routine.
+<b class="algo">Opheim</b> uses both a minimum and a maximum distance tolerance
+to constrain the search area. For each successive vertex v<sub>i</sub>, its radial
+distance to the current key v<sub>key</sub> (initially v<sub>0</sub>) is calculated.
+The last point within the minimum distance tolerance is used to define a ray
+R (v<sub>key</sub>, v<sub>i</sub>). If no such v<sub>i</sub> exists, the ray is
+defined as R(v<sub>key</sub>, v<sub>key+1</sub>). For each successive vertex
+v<sub>j</sub> beyond v<sub>i</sub> its perpendicular distance to the ray R is
+calculated. A new key is found at v<sub>j-1</sub>, when this distance exceeds
+the minimum tolerance Or when the radial distance between v<sub>j</sub> and the
+v<sub>key</sub> exceeds the maximum tolerance. After a new key is found, the
+process repeats itself.</p>
+
+<div class="img"><img title="Opheim simplification" alt="Opheim simplification example" src="images/psimpl_op.png"></div>
+
+<p>The <b class="algo">Opheim</b> simplification process is illustrated above.
+Notice how the search area is constrained by a minimum and a maximum tolerance.
+As a result, during the second step, only a single point is removed. The
+<b class="algo">Reumann-Witkam</b> routine, which uses an infinite or
+unconstrained search area, would have removed two points.</p>
+
+<h2>Interface</h2>
+
+<pre><span class="keyword">template</span> &lt;<span class="keyword">unsigned</span> DIM, <span class="keyword">class</span> ForwardIterator, <span class="keyword">class</span> OutputIterator&gt;
+OutputIterator <span class="algorithm">simplify_opheim</span> (
+    ForwardIterator first,
+    ForwardIterator last,
+    <span class="keyword">typename</span> std::iterator_traits &lt;ForwardIterator&gt;::value_type minTol,
+    <span class="keyword">typename</span> std::iterator_traits &lt;ForwardIterator&gt;::value_type maxTol,
+    OutputIterator result)</pre>
+
+<p>Applies the <b class="algo">Opheim</b> routine to the range
+<code>[first, last)</code> using the specified distance tolerances
+<code>minTol</code> and <code>maxTol</code>. The resulting simplified polyline
+is copied to the output range <code>[result, result + m * DIM)</code>, where
+<code>m</code> is the number of vertices of the simplified polyline. The return
+value is the end of the output range: <code>result + m * DIM</code>.</p>
+
+<h2>Input (Type) Requirements</h2>
+
+<ol>
+<li><code>DIM</code> is not 0, where <code>DIM</code> represents the dimension of the polyline</li>
+<li>The <code>ForwardIterator</code> value type is convertible to the value type of the <code>OutputIterator</code></li>
+<li>The range <code>[first, last)</code> contains vertex coordinates in multiples of <code>DIM</code>, e.g.: x, y, z, x, y, z, x, y, z when <code>DIM</code> = 3</li>
+<li>The range <code>[first, last)</code> contains at least 2 vertices</li>
+<li><code>minTol</code> is not 0</li>
+<li><code>maxTol</code> is not 0</li>
+</ol>
+
+<p>In case these requirements are not met, the entire input range
+<code>[first, last)</code> is copied to the output range 
+<code>[result, result + (last - first))</code>, <b>or</b> compile errors may
+occur.</p> 
+
+<h2>Implementation Details</h2>
+
+<p>All the articles that I found mentioning or discussing the <b class="algo">Opheim</b>
+algorithm, failed to explain how to define the ray that controls the direction of
+the search area. As far as I can tell, there are three possible ways of determining
+this ray R(v<sub>key</sub>, v<sub>i</sub>), where v<sub>key</sub> is the current key.</p>
+
+<ol>
+<li>The <b class="algo">Reumann-Witkam</b> way: i = key + 1 </li>
+<li>The first point outside: key &lt; i and v<sub>i</sub> is the first point that falls outside the minimum radial distance tolerance</li>
+<li>The last point inside: key &lt; i and v<sub>i</sub> is the last point that falls inside the minimum radial distance tolerance; if no such v<sub>i</sub> exists, fall back to the <b class="algo">Reumann-Witkam</b> way</li>
+</ol>
+
+<div class="img"><img title="Opheim ray definition" alt="Opheim ray definition example" src="images/psimpl_op_ray.png"></div>
+
+<p>I compared these three approaches using postitional error statistics and found
+that '<b>the first point outside</b>' approach, most of the time, produces
+slightly better results than the '<b>Reumann-Witkam</b>' approach. Furthermore,
+there did not seem to be any real difference between the '<b>last point inside</b>'
+and '<b>the first point outside</b>' approaches. I ended up choosing the
+'<b>last point inside</b>' approach, because it was a better fit for the
+loop that I had already implemented.</p>
+
+<h2>Usage</h2>
+
+<pre><span class="keyword">float</span> minimum = 10.f;          <span class="comment">// minimum distance tolerance</span>
+<span class="keyword">float</span> maximum = 100.f;         <span class="comment">// maximum distance tolerance</span>
+std::vector &lt;<span class="keyword">double</span>&gt; polyline; <span class="comment">// original polyline, assume not empty</span>
+std::vector &lt;<span class="keyword">double</span>&gt; result;   <span class="comment">// resulting simplified polyline</span>
+
+<span class="comment">// simplify the 4d polyline</span>
+psimpl::<span class="algorithm">simplify_opheim</span> &lt;4&gt; (
+    polyline.begin (), polyline.end (),
+    minimum, maximum, std::back_inserter (result));</pre>
+
+    </div>
+    <div id="footer">Copyright &copy; 2010-2011 <a title="Contact address" href="mailto:edekoning@gmail.com?subject=psimpl">Elmar de Koning</a>. All Rights Reserved.</div>
+</div>
+</body>
+</html>

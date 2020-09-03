@@ -1,0 +1,132 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="Content-Type">
+  <meta name="description" content="Lang algorithm for polyline simplification">
+  <meta name="keywords" content="Lang, algorithm, psimpl, polyline, simplification, library, c++, simplify, reduce, decimate, approximate">
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <title>psimpl - Lang simplification</title>
+</head>
+<body>
+<div id="main_container">
+    <div id="header">
+        <div id="title"><h1>psimpl</h1></div>
+        <div id="sub_title"><h2>generic n-dimensional poyline simplification</h2></div>
+        <div id="nav">
+            <a title="Home" href="index.html">Home</a>
+            <a title="News" href="news.html">News</a>
+            <a title="Documentation" href="documentation.html">Documentation</a>
+            <a title="Downloads" href="downloads.html">Download</a>
+        </div>
+    </div>
+    <div id="sidebar">
+        <div>
+            <span>Simplification:</span>
+            <ul>
+                <li><a title="Nth Point" href="nth-point.html">Nth Point</a></li>
+                <li><a title="Radial Distance" href="radial-distance.html">Radial Distance</a></li>
+                <li><a title="Perpendicular Distance" href="perpendicular-distance.html">Perpendicular Distance</a></li>
+                <li><a title="Reumann-Witkam" href="reumann-witkam.html">Reumann-Witkam</a></li>
+                <li><a title="Opheim" href="opheim.html">Opheim</a></li>
+                <li><a title="Lang" href="lang.html">Lang</a></li>
+                <li><a title="Douglas-Peucker" href="douglas-peucker.html">Douglas-Peucker</a></li>
+            </ul>
+        </div>
+        <div>
+            <span>Errors:</span>
+            <ul>
+                <li><a title="Positional Errors" href="positional-errors.html">Positional</a></li>
+            </ul>
+        </div>
+    </div>
+    <div id="content">
+    
+<h1>Lang</h1>
+
+<p>The <b class="algo">Lang</b> simplification algorithm defines a fixed size
+search-region. The first and last points of that search region form a segment.
+This segment is used to calculate the perpendicular distance to each intermediate
+point. If any calculated distance is larger than the specified tolerance, the
+search region will be shrunk by excluding its last point. This process will
+continue untill all calculated distances fall below the specified tolerance,
+or when there are no more intermediate points. All intermediate points are
+removed and a new search region is defined starting at the last point from old
+search region. This process is illustrated below:</p>
+
+<div class="img"><img title="Lang simplification" alt="Lang simplification example" src="images/psimpl_la.png"></div>
+
+<p>The search region is constructed using a <code>look_ahead</code> value of 4.
+For each intermediate vertex, its perpendicular distance to the segment 
+S (v<sub>0</sub>, v<sub>4</sub>) is calculated. Since at least one distance is
+greater than the tolerance, the search region is reduced by one vertex. After
+recalculating the distances to S (v<sub>0</sub>, v<sub>3</sub>), all intermediate
+vertices fall within the tolerance. The last vertex of the search region
+v<sub>3</sub> defines a new key. This process repeats itself by updating the
+search region and defining a new segment S (v<sub>3</sub>,
+v<sub>7</sub>). </p>
+
+<h2>Interface</h2>
+
+<pre><span class="keyword">template</span> &lt;<span class="keyword">unsigned</span> DIM, <span class="keyword">class</span> BidirectionalIterator, <span class="keyword">class</span> OutputIterator&gt;
+OutputIterator <span class="algorithm">simplify_lang</span> (
+    BidirectionalIterator first,
+    BidirectionalIterator last,
+    <span class="keyword">typename</span> std::iterator_traits &lt;BidirectionalIterator&gt;::value_type tol,
+    <span class="keyword">unsigned</span> look_ahead,
+    OutputIterator result)</pre>
+
+<p>Applies the <b class="algo">Lang</b> simplification algorithm to the range
+<code>[first, last)</code> using the specified perpendicular distance tolerance
+and look ahead values. The resulting simplified polyline is copied to the output
+range <code>[result, result +  m * DIM)</code>, where <code>m</code> is the
+number of vertices of the simplified polyline. The return value is the end of the
+output range: <code>result +  m * DIM</code>.</p>
+
+<h2>Input (Type) Requirements</h2>
+
+<ol>
+<li><code>DIM</code> is not 0, where <code>DIM</code> represents the dimension of the polyline</li>
+<li>The <code>BidirectionalIterator</code> value type is convertible to the value type of the <code>OutputIterator</code></li>
+<li>The range <code>[first, last)</code> contains vertex coordinates in multiples of <code>DIM</code>, e.g.: x, y, z, x, y, z, x, y, z when <code>DIM</code> = 3</li>
+<li>The range <code>[first, last)</code> contains at least 2 vertices</li>
+<li><code>tol</code> is not 0</li>
+<li><code>look_ahead</code> is not 0</li>
+</ol>
+
+<p>In case these requirements are not met, the entire input range
+<code>[first, last)</code> is copied to the output range 
+<code>[result, result + (last - first))</code>, <b>or</b> compile errors may
+occur.</p> 
+
+<h2>Implementation Details</h2>
+
+<p>The <b class="algo">Lang</b> simplification algorithm has the requirement that
+its input iterators model the concept of a bidirectional iterator. The reason for
+this is that a search region S (v<sub>i</sub>, v<sub>i+n</sub>) may have
+to be reduced to S (v<sub>i</sub>, v<sub>i+(n-1)</sub>). The easiest way to do this
+is by decrementing the iterator pointing to v<sub>i+n</sub>. Although
+it would be possible to just increment a copy of v<sub>i</sub> n-1 times, it
+requires extra bookkeeping. It also complicates the code somewhat, as we would
+only want to take this approach for forward iterators.</p>
+
+<h2>Usage</h2>
+
+<pre><span class="keyword">float</span> tolerance = 10.f;       <span class="comment">// point-to-segment distance tolerance</span>
+<span class="keyword">unsigned</span> look_ahead = 7;      <span class="comment">// search region size</span>
+std::vector &lt;<span class="keyword">float</span>&gt; polyline; <span class="comment">// original polyline, assume not empty</span>
+std::vector &lt;<span class="keyword">double</span>&gt; result;  <span class="comment">// resulting simplified polyline</span>
+
+<span class="comment">// simplify the 5d polyline</span>
+psimpl::<span class="algorithm">simplify_lang</span> &lt;5&gt; (
+    polyline.begin (), polyline.end (),
+    tolerance, look_ahead,
+    std::back_inserter (result));</pre>
+
+<p>Using a <code>look_ahead</code> value of 7, means that the resulting simplification
+will always contain at least 1/7 or 14% of the original points. The <code>look_ahead</code>
+value constrains the simplification.</p>
+    </div>
+    <div id="footer">Copyright &copy; 2010-2011 <a title="Contact address" href="mailto:edekoning@gmail.com?subject=psimpl">Elmar de Koning</a>. All Rights Reserved.</div>
+</div>
+</body>
+</html>

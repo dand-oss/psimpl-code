@@ -1,0 +1,125 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="Content-Type">
+  <meta name="description" content="downloads for psimpl - a generic n-dimensional polyline simplification library">
+  <meta name="keywords" content="downloads, psimpl, polyline, simplification, library, c++, simplify, reduce, decimate, approximate">
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <title>psimpl - downloads</title>
+</head>
+<body>
+<div id="main_container">
+    <div id="header">
+        <div id="title"><h1>psimpl</h1></div>
+        <div id="sub_title"><h2>generic n-dimensional poyline simplification</h2></div>
+        <div id="nav">
+            <a title="Home" href="index.html">Home</a>
+            <a title="News" href="news.html">News</a>
+            <a title="Documentation" href="documentation.html">Documentation</a>
+            <a title="Downloads" href="downloads.html">Download</a>
+        </div>
+    </div>
+    <div id="content">
+    
+    <p><b class="proj">psimpl</b> provides a source code only package and a
+    32-bit demo application for Windows:</p>
+
+    <div id="button">
+        <a title="psimpl v7 source code" href="http://sourceforge.net/projects/psimpl/files/v7/psimpl_v7_src.zip/download">source code</a>
+        <a title="psimpl v7 demo application" href="http://sourceforge.net/projects/psimpl/files/v7/psimpl_v7_win32_demo.zip/download">win32 demo</a>
+    </div>
+    
+    <p>The latest version can also be downloaded from <a title="Alternative download location" href="http://www.codeproject.com/KB/recipes/PolylineSimplification.aspx">The Code Project</a>.
+    Older versions are available through the project website at <a title="Browse older versions" href="http://sourceforge.net/projects/psimpl/files/">SourceForge</a>.</p>
+
+    <br>
+
+    <p>Feel free to contact me for suggestion, remarks, bugs, requests. If you
+    do decide to use <b class="proj">psimpl</b>, let me know! I would love to
+    hear where my code ends up and why you chose to use it.</p>
+    
+    <hr>
+    
+    <h1>Changelog</h1>
+    
+    <div class="news">
+        <div class="title">v7</div>
+        <hr>
+        <div class="date">18-06-2011</div>
+        <p>Added the <b class="algo">Lang</b> simplification algorithm, and
+        documented the input iterator type requirements for each algorithm.
+        <br><br>
+        Fixed several bugs:
+        <ul>
+        <li>divide by zero problem when using integers</li>
+        <li>incorrect output iterators returned under invalid input</li>
+        <li><code>douglas_peucker_n</code> - an incorrect number of
+        points could be returned</li>
+        <li><code>compute_positional_errors2</code> - required identical input
+        iterator and output iterator types</li>
+        <li><code>compute_positional_error_statistics</code> - invalid
+        statistics could be returned under questionable input</li>
+        </p>
+    </div>
+    
+    <div class="news">
+        <div class="title">v6</div>
+        <hr>
+        <div class="date">27-02-2011</div>
+        <p>Added <b class="algo">Opheim</b> simplification, and functions
+        for computing positional errors due to simplification. Renamed the
+        function <code>simplify_douglas_peucker_alt</code> to
+        <code>simplify_douglas_peucker_n</code>.</p>
+    </div>
+    
+    <div class="news">
+        <div class="title">v5</div>
+        <hr>
+        <div class="date">10-12-2010</div>
+        <p>Fixed an iterator out of bounds bug in the
+        <b class="algo">Perpendicular Distance</b> routine.</p>
+    </div>
+    
+    <div class="news">
+        <div class="title">v4</div>
+        <hr>
+        <div class="date">01-12-2010</div>
+        <p>Added the <b class="algo">Nth Point</b>,
+        <b class="algo">Perpendicular Distance</b>, and
+        <b class="algo">Reumann-Witkam</b> simplifications algorithms.
+        Moved all functions related to distance calculations to a separate
+        <code>math</code> namespace; Performed general refactoring.</p>
+    </div>
+    
+    <div class="news">
+        <div class="title">v3</div>
+        <hr>
+        <div class="date">26-10-2010</div>
+        <p>Clarified input (type) requirements, and changed the behavior of all
+        algorithms under invalid input. In these cases the entire input range is
+        copied to the output range, meaning no simplification is performed.
+    </div>
+    
+    <div class="news">
+        <div class="title">v2</div>
+        <hr>
+        <div class="date">23-10-2010</div>
+        <p>Changed license from the "Code Project Open License" (CPOL) to the
+        "Mozilla Public License 1.1" (MPL 1.1).</p>
+    </div>
+    
+    <div class="news">
+        <div class="title">v1</div>
+        <hr>
+        <div class="date">28-09-2010</div>
+        <p>Initial release as part of the article "Polyline Simplification"
+        on The Code Project. Provides implementations for
+        <b class="algo">Douglas-Peucker</b> and
+        <b class="algo">Radial Distance</b> simplification algorithms.</p>
+    </div>
+        
+    </div>
+    <div id="footer">Copyright &copy; 2010-2011 <a title="Contact address" href="mailto:edekoning@gmail.com?subject=psimpl">Elmar de Koning</a>. All Rights Reserved.</div>
+</div>
+</body>
+</html>
