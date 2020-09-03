@@ -336,7 +336,7 @@ namespace psimpl {
             diff_type coordCount = std::distance (first, last);
 
             // first pass: [first, last) --> temporary array 'tempPoly'
-            util::scoped_array <value_type> tempPoly (coordCount);
+            util::scoped_array <value_type> tempPoly (static_cast<unsigned>(coordCount));
 
             diff_type tempCoordCount = std::distance (
                 tempPoly.get (),
@@ -357,7 +357,7 @@ namespace psimpl {
 
             // intermediate passes: temporary array 'tempPoly' --> temporary array 'tempResult'
             if (1 < repeat) {
-                util::scoped_array <value_type> tempResult (coordCount);
+                util::scoped_array <value_type> tempResult (static_cast<unsigned>(coordCount));
 
                 while (--repeat) {
                     tempCoordCount = std::distance (
@@ -654,10 +654,10 @@ namespace psimpl {
             }
 
             // keep track of what points are part of the simplification (key)
-            util::scoped_array <unsigned char> keys (pointCount);
+            util::scoped_array <unsigned char> keys (static_cast<unsigned>(pointCount));
             std::fill_n (keys.get (), pointCount, 0);
             keys [0] = 1;                   // the first point is always a key
-            keys [pointCount - 1] = 1;      // the last point is always a key
+            keys [static_cast<int>(pointCount - 1)] = 1;      // the last point is always a key
 
             // keep track of all sub polylines that still need to be processed
             std::stack <sub_poly> stack;    // LIFO job-queue
@@ -671,7 +671,7 @@ namespace psimpl {
                 key_type key = key_finder::apply (first, poly.first, poly.last);
                 if (key.index && tol2 < key.dist2) {
                     // store the key if valid
-                    keys [key.index / DIM] = 1;
+                    keys [static_cast<int>(key.index / DIM)] = 1;
                     // split the polyline at the key and recurse
                     stack.push (sub_poly (key.index, poly.last));
                     stack.push (sub_poly (poly.first, key.index));
@@ -729,7 +729,7 @@ namespace psimpl {
                 return std::copy (first, last, result);
             }
             // radial distance simplification routine
-            util::scoped_array <value_type> reduced (coordCount);    // radial distance results
+            util::scoped_array <value_type> reduced (static_cast<unsigned>(coordCount));    // radial distance results
             diff_type reducedCoordCount = std::distance (
                 reduced.get (),
                 radial_distance
@@ -791,10 +791,10 @@ namespace psimpl {
             }
 
             // keep track of what points are part of the simplification (keys)
-            util::scoped_array <unsigned char> keys (pointCount);
+            util::scoped_array <unsigned char> keys (static_cast<unsigned>(pointCount));
             std::fill_n (keys.get (), pointCount, 0);
             keys [0] = 1;                   // the first point is always a key
-            keys [pointCount - 1] = 1;      // the last point is always a key
+            keys [static_cast<int>(pointCount - 1)] = 1;      // the last point is always a key
             Size keyCount = 2;
 
             if (tol == 2) {
@@ -812,7 +812,7 @@ namespace psimpl {
                 poly = queue.top ();                 // take a sub poly
                 queue.pop ();
                 // store the key
-                keys [poly.key.index / DIM] = 1;
+                keys [static_cast<int>(poly.key.index / DIM)] = 1;
                 // check point count tolerance
                 if (++keyCount == tol) {
                     break;

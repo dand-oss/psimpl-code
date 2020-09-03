@@ -93,9 +93,9 @@ namespace psimpl {
             value_type init = 0;
             stats.max = static_cast <double> (*std::max_element (first, last));
             stats.sum = static_cast <double> (std::accumulate (first, last, init));
-            stats.mean = stats.sum / count;
+            stats.mean = stats.sum / static_cast<double>(count);
             std::transform (first, last, first, std::bind2nd (std::minus <value_type> (), stats.mean));
-            stats.std = std::sqrt (static_cast <double> (std::inner_product (first, last, first, init)) / count);
+            stats.std = std::sqrt (static_cast <double> (std::inner_product (first, last, first, init)) / static_cast<double>(count));
             return stats;
         }
     }
@@ -211,7 +211,7 @@ namespace psimpl {
             typedef typename std::iterator_traits <ForwardIterator1>::difference_type diff_type;
 
             diff_type pointCount = std::distance (original_first, original_last) / DIM;
-            util::scoped_array <double> errors (pointCount);
+            util::scoped_array <double> errors (static_cast<unsigned>(pointCount));
 
             diff_type errorCount = std::distance (
                 errors.get (),
