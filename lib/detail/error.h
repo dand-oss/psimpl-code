@@ -225,9 +225,12 @@ namespace psimpl {
                             simplified_first, simplified_last,
                             errors.get (), valid));
 
-            std::transform (errors.get (), errors.get () + errorCount,
-                            errors.get (),
-                            std::ptr_fun <double, double> (std::sqrt));
+            std::transform(
+                errors.get(),
+                errors.get() + errorCount,
+                errors.get(),
+                [](double f) -> auto { return sqrt(f); } // call the double version
+            );
 
             return detail::compute_statistics (errors.get (), errors.get () + errorCount);
         }
