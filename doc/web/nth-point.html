@@ -1,0 +1,112 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="Content-Type">
+  <meta name="description" content="nth point routine for polyline simplification">
+  <meta name="keywords" content="nth point, algorithm, psimpl, polyline, simplification, library, c++, simplify, reduce, decimate, approximate">
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <title>psimpl - nth point simplification</title>
+</head>
+<body>
+<div id="main_container">
+    <div id="header">
+        <div id="title"><h1>psimpl</h1></div>
+        <div id="sub_title"><h2>generic n-dimensional poyline simplification</h2></div>
+        <div id="nav">
+            <a title="Home" href="index.html">Home</a>
+            <a title="News" href="news.html">News</a>
+            <a title="Documentation" href="documentation.html">Documentation</a>
+            <a title="Downloads" href="downloads.html">Download</a>
+        </div>
+    </div>
+    <div id="sidebar">
+        <div>
+            <span>Simplification:</span>
+            <ul>
+                <li><a title="Nth Point" href="nth-point.html">Nth Point</a></li>
+                <li><a title="Radial Distance" href="radial-distance.html">Radial Distance</a></li>
+                <li><a title="Perpendicular Distance" href="perpendicular-distance.html">Perpendicular Distance</a></li>
+                <li><a title="Reumann-Witkam" href="reumann-witkam.html">Reumann-Witkam</a></li>
+                <li><a title="Opheim" href="opheim.html">Opheim</a></li>
+                <li><a title="Lang" href="lang.html">Lang</a></li>
+                <li><a title="Douglas-Peucker" href="douglas-peucker.html">Douglas-Peucker</a></li>
+            </ul>
+        </div>
+        <div>
+            <span>Errors:</span>
+            <ul>
+                <li><a title="Positional Errors" href="positional-errors.html">Positional</a></li>
+            </ul>
+        </div>
+    </div>
+    <div id="content">
+
+<h1>Nth Point</h1>
+
+<p>The <b class="algo">nth point</b> routine is a naive O(n) algorithm for polyline
+simplification. It keeps only the <i>first</i>, <i>last</i>, and each <i>nth</i> point.
+All other points are removed. This process is illustrated below:</p> 
+
+<div class="img"><img title="Nth Point simplification" alt="Nth Point simplification example" src="images/psimpl_np.png"></div> 
+
+<p>The illustration shows a polyline consisting of 8 vertices:
+{v<sub>1</sub>, v<sub>2</sub> ... v<sub>8</sub>}. This polyline was simplified
+using <b>n = 3</b>. The resulting simplification consists of vertices: 
+{v<sub>1</sub>, v<sub>4</sub>, v<sub>7</sub>, v<sub>8</sub>}.</p> 
+
+<p>The algorithm is extremely fast, but unfortunately, it not very good at
+preserving the geometric features of a line.</p> 
+
+<h2>Interface</h2> 
+ 
+<pre><span class="keyword">template</span> &lt;<span class="keyword">unsigned</span> DIM, <span class="keyword">class</span> ForwardIterator, <span class="keyword">class</span> OutputIterator&gt;
+OutputIterator <span class="algorithm">simplify_nth_point</span> (
+    ForwardIterator first,
+    ForwardIterator last,
+    <span class="keyword">unsigned</span> n,
+    OutputIterator result)</pre> 
+ 
+<p>Applies the <b class="algo">nth point</b> routine to the range <code>[first, last)</code>
+ using the specified value for <code>n</code>. The resulting simplified polyline
+ is copied to the output range <code>[result, result + m * DIM)</code>, where
+ <code>m</code> is the number of vertices of the simplified polyline. The return
+ value is the end of the output range: <code>result + m * DIM</code>.</p> 
+ 
+<h2>Input (Type) Requirements</h2> 
+ 
+<ol> 
+ <li><code>DIM</code> is not 0, where <code>DIM</code> represents the dimension of the polyline</li> 
+ <li>The <code>ForwardIterator</code> value type is convertible to the value type of the <code>OutputIterator</code></li> 
+ <li>The range <code>[first, last)</code> contains vertex coordinates in multiples of <code>DIM</code>, e.g.: x, y, z, x, y, z, x, y, z when <code>DIM</code> = 3</li> 
+ <li>The range <code>[first, last)</code> contains at least 2 vertices</li> 
+ <li><code>n</code> is not 0</li> 
+</ol> 
+ 
+<p>In case these requirements are not met, the entire input range
+<code>[first, last)</code> is copied to the output range 
+<code>[result, result + (last - first))</code>, <b>or</b> compile errors may
+occur.</p> 
+ 
+<h2>Implementation Details</h2> 
+ 
+<p>Algorithms don't get much simpler than this. A loop is used to copy the
+ <i>first</i> point and each following <i>nth</i> point of the input polyline to
+ the simplification result. After the loop, I make sure that the <i>last</i>
+ point is part of the simplification.</p> 
+ 
+<h2>Usage</h2> 
+ 
+<pre><span class="keyword">unsigned</span> n = 10;              <span class="comment">// reduce to 10%</span>
+std::vector &lt;<span class="keyword">float</span>&gt; polyline; <span class="comment">// original polyline, assume not empty</span>
+std::vector &lt;<span class="keyword">float</span>&gt; result;   <span class="comment">// resulting simplified polyline</span>
+ 
+<span class="comment">// simplify the 2d polyline</span>
+psimpl::<span class="algorithm">simplify_nth_point</span> &lt;2&gt; (
+    polyline.begin (), polyline.end (),
+    n, std::back_inserter (result));</pre>
+    
+    </div>
+    <div id="footer">Copyright &copy; 2010-2011 <a title="Contact address" href="mailto:edekoning@gmail.com?subject=psimpl">Elmar de Koning</a>. All Rights Reserved.</div>
+</div>
+</body>
+</html>

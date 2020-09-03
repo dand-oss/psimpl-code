@@ -1,0 +1,175 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="Content-Type">
+  <meta name="description" content="project and algorithm documentation for psimpl - a generic n-dimensional polyline simplification library">
+  <meta name="keywords" content="documentation, psimpl, polyline, simplification, library, c++, simplify, reduce, decimate, approximate">
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <title>psimpl - documentation</title>
+</head>
+<body>
+<div id="main_container">
+    <div id="header">
+        <div id="title"><h1>psimpl</h1></div>
+        <div id="sub_title"><h2>generic n-dimensional poyline simplification</h2></div>
+        <div id="nav">
+            <a title="Home" href="index.html">Home</a>
+            <a title="News" href="news.html">News</a>
+            <a title="Documentation" href="documentation.html">Documentation</a>
+            <a title="Downloads" href="downloads.html">Download</a>
+        </div>
+    </div>
+    <div id="sidebar">
+        <div>
+            <span>Simplification:</span>
+            <ul>
+                <li><a title="Nth Point" href="nth-point.html">Nth Point</a></li>
+                <li><a title="Radial Distance" href="radial-distance.html">Radial Distance</a></li>
+                <li><a title="Perpendicular Distance" href="perpendicular-distance.html">Perpendicular Distance</a></li>
+                <li><a title="Reumann-Witkam" href="reumann-witkam.html">Reumann-Witkam</a></li>
+                <li><a title="Opheim" href="opheim.html">Opheim</a></li>
+                <li><a title="Lang" href="lang.html">Lang</a></li>
+                <li><a title="Douglas-Peucker" href="douglas-peucker.html">Douglas-Peucker</a></li>
+            </ul>
+        </div>
+        <div>
+            <span>Errors:</span>
+            <ul>
+                <li><a title="Positional Errors" href="positional-errors.html">Positional</a></li>
+            </ul>
+        </div>
+    </div>
+    <div id="content">
+        <h1>Algorithms</h1>
+        
+        <p>Each algorithm that <b class="proj">psimpl</b> provides, is based on 
+        a STL-style like interface with input and output iterators that iterate
+        over vertex coordinates, e.g.: x<sub>1</sub>, y<sub>1</sub>,
+        z<sub>1</sub>, x<sub>2</sub>, y<sub>2</sub>, z<sub>2</sub>, ... They all
+        support n-dimensional polylines defined with either floating point or
+        signed integer data types.</p>
+        
+        <p>For more information about an individual algorithms, click on its
+        name in the sidebar on the left.</p>
+        
+        <hr>
+        
+        <h1>The code</h1>
+        
+        <p><b class="proj">psimpl</b> consists of a single header file: 
+        <code>psimpl.h</code>. This header file in turn relies only on a
+        handfull of standard C++ headers. No additional libraries or files
+        are needed!</p>
+        
+        <p>All code in <code>psimpl.h</code> is organized in the following
+        structure:</p>
+        <ul class="code">
+        <li>namspace <code>psimpl</code>
+            <ul>
+            <li>namspace <code>util</code>
+                <ul>
+                <li>class <code>scoped_array &lt;T&gt;</code></li>
+                </ul>
+            </li>
+            <li>namspace <code>math</code>
+                <ul>
+                <li>struct <code>Statistics</code></li>
+                <li>function <code>dot &lt;unsigned, InputIterator&gt;</code></li>
+                <li>function ...</li>
+                </ul>
+            </li>
+            <li>class <code>PolylineSimplification &lt;unsigned, InputIterator, OutputIterator&gt;</code>
+                <ul>
+                <li>function <code>NthPoint</code></li>
+                <li>function <code>...</code></li>
+                </ul>
+            </li>
+            <li>function <code>simplify_nth_point &lt;unsigned, ForwardIterator, OutputIterator&gt;</code></li>
+            <li>function <code>simplify_...</code></li>
+            <li>function <code>compute_...</code></li>            
+            </ul>
+        </li>
+        </ul>
+        
+        <p>All the code is contained within the root namespace <code>psimpl</code>.
+        The class <code>scoped_array</code>, similar to <code>boost::scoped_array</code>,
+        is a smart pointer for holding a dynamically allocated array. <code>math</code>
+        is a namespace containing all functions related to computing statistics
+        and squared distances between various geometric entities. The class 
+        <code>PolylineSimplification</code> provides the implementation for each
+        simplification algorithm. The top-level functions are for convenience as
+        they provide template type deduction for their corresponding member
+        functions of <code>PolylineSimplification</code>.</p>
+
+        <p><b class="proj">psimpl</b> itself does not throw exceptions. The
+        reason for this is that I consider exception handling to be rather rare
+        within C++ applications. Unlike the .NET world, a lot of developers just
+        don't use nor even think about exception handling.</p>
+
+        <hr>
+        
+        <h1>The demo</h1>
+        
+        <div class="img"><img title="psimpl demo application" alt="psimpl demo application screenshot" src="images/psimpl_demo.png"></div>
+        
+        <p><b class="proj">psimpl</b> also provides a 32-bit Windows demo
+        application, that allows you to experiment with the different simplification
+        algorithms. It can generate pseudo random 2D-polylines of up to 10,000,000
+        vertices in various types of containers. The bounding-box of the generated
+        polyline is always n x n/2, where n is the amount of vertices of the generated
+        polyline. Use this fact to specify a proper tolerances. Comparing the various
+        algorithms can be done visually and by using the computed positional error
+        statistics. These statistics are only available when the <code>value_type</code>
+        of the chosen container is <code>double</code>.</p>
+
+        <p>Internally, the generated and simplified polylines are always stored in
+        a <code>QVector&lt;double&gt;</code>. Just before simplification, it is
+        converted to the selected container type. Afterwards, this temporary container
+        is destructed. Normally, you won't notice this, but it seems that creating
+        and destructing a <code>std::list(10.000.000)</code> can take a rather long
+        time. The resulting performance measurements never include these conversion
+        steps. I chose this approach as it allowed me to quickly add new container
+        types.</p>
+
+        <p>Note that the entire application is single threaded (sorry for being lazy),
+        meaning it could go 'not responding' during a long-running simplification.</p>
+
+        <p>The demo application was made using Qt 4.7.3, Qt Creator 2.1.0, and Visual
+        Studio 2008 Express. Complete source code is included.</p>
+        
+        <hr>
+        
+        <h1>Upcomming versions</h1>
+        
+        <p>The following algorithms are planned for upcomming versions:</p>
+        <ul>
+        <li>Random Point routine</li>
+        <li>Jenks simplification</li>
+        <li><del>Lang simplification</del></li>
+        <li>Visvalingam-Whyatt simplification</li>
+        <li>Zhao-Saalfeld simplification</li>
+        <li>Computing Length errors due to simplification</li>
+        <li>Computing Area errors due to simplification</li>
+        </ul>
+        
+        <br>
+       
+        <p>Other things that I want to look into include:</p>
+        <ul>
+        <li>Make the input tolerance type a template parameter: currently the 
+        tolerance type is the same as the value type of the input iterators.
+        This means that when using integer coordinates, all distance calculations
+        will be performed using integers.</li>
+        <li>Split Douglas-Peucker into two algorithms: a vanilla implementation
+        and one that uses Radial Distance as a pre-processing step</li>
+        <li>A seperate version that operates on <i>point</i> containers instead
+        of <i>coordinate</i> containers</li>
+        <li>Error calculations that works for situations where the data
+        type of a simplification differs from the original polyline</li>
+        </ul>
+                
+    </div>
+    <div id="footer">Copyright &copy; 2010-2011 <a title="Contact address" href="mailto:edekoning@gmail.com?subject=psimpl">Elmar de Koning</a>. All Rights Reserved.</div>
+</div>
+</body>
+</html>

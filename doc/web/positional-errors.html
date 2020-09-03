@@ -1,0 +1,144 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="Content-Type">
+  <meta name="description" content="positional error calculation for polyline simplification">
+  <meta name="keywords" content="positional error, algorithm, psimpl, polyline, simplification, library, c++, simplify, reduce, decimate, approximate">
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <title>psimpl - positional error calculation</title>
+</head>
+<body>
+<div id="main_container">
+    <div id="header">
+        <div id="title"><h1>psimpl</h1></div>
+        <div id="sub_title"><h2>generic n-dimensional poyline simplification</h2></div>
+        <div id="nav">
+            <a title="Home" href="index.html">Home</a>
+            <a title="News" href="news.html">News</a>
+            <a title="Documentation" href="documentation.html">Documentation</a>
+            <a title="Downloads" href="downloads.html">Download</a>
+        </div>
+    </div>
+    <div id="sidebar">
+        <div>
+            <span>Simplification:</span>
+            <ul>
+                <li><a title="Nth Point" href="nth-point.html">Nth Point</a></li>
+                <li><a title="Radial Distance" href="radial-distance.html">Radial Distance</a></li>
+                <li><a title="Perpendicular Distance" href="perpendicular-distance.html">Perpendicular Distance</a></li>
+                <li><a title="Reumann-Witkam" href="reumann-witkam.html">Reumann-Witkam</a></li>
+                <li><a title="Opheim" href="opheim.html">Opheim</a></li>
+                <li><a title="Lang" href="lang.html">Lang</a></li>
+                <li><a title="Douglas-Peucker" href="douglas-peucker.html">Douglas-Peucker</a></li>
+            </ul>
+        </div>
+        <div>
+            <span>Errors:</span>
+            <ul>
+                <li><a title="Positional Errors" href="positional-errors.html">Positional</a></li>
+            </ul>
+        </div>
+    </div>
+    <div id="content">
+
+<h1>Positional Errors</h1>
+
+<p>Simplifying a polyline introduces shape distortion. The higher the degree of
+simplification the higher the amount of distortion. One way of measuring this
+error induced by simplification, is by looking at the location difference between
+the original and the simplified line.</p>
+
+<div class="img"><img title="Positional Errors after simplification" alt="Positional Errors after simplification example" src="images/psimpl_pos_error.png"></div>
+
+<p>For each original point the positional error is calculated as the perpendiculer
+difference between that point and the corresponding line segment of the simplification.
+Better performing simplification algorithms consistently produce lower positional errors.</p>
+
+<h2>Interface</h2>
+
+<pre><span class="keyword">template</span> &lt;<span class="keyword">unsigned</span> DIM, <span class="keyword">class</span> ForwardIterator, <span class="keyword">class</span> OutputIterator&gt;
+OutputIterator <span class="algorithm">compute_positional_errors2</span> (
+    ForwardIterator original_first,
+    ForwardIterator original_last,
+    ForwardIterator simplified_first,
+    ForwardIterator simplified_last,
+    OutputIterator result,
+    <span class="keyword">bool</span>* valid=0)</pre>
+
+<p>For each point in the range <code>[original_first, original_last)</code> the
+<b>squared</b> distance to the simplification <code>[simplified_first, simplified_last)</code>
+is calculated. Each positional error is copied to the output range
+<code>[result, result + (original_last - original_first))</code>. Note that both
+the original and simplified polyline must be defined using the same <code>value_type</code>.</p>
+
+<pre><span class="keyword">template</span> &lt;<span class="keyword">unsigned</span> DIM, <span class="keyword">class</span> ForwardIterator&gt;
+math::Statistics <span class="algorithm">compute_positional_error_statistics</span> (
+    ForwardIterator original_first,
+    ForwardIterator original_last,
+    ForwardIterator simplified_first,
+    ForwardIterator simplified_last,
+    <span class="keyword">bool</span>* valid=0)</pre>
+
+<p>Computes statistics (mean, max, sum, std) for the positional errors between the
+range <code>[original_first, original_last)</code> and its simplification the range
+<code>[simplified_first, simplified_last)</code>. All statistics are stored as
+<code>doubles</code>.</p>
+
+<h2>Input (Type) Requirements</h2>
+
+<ol>
+<li><code>DIM</code> is not 0, where <code>DIM</code> represents the dimension of the polyline</li>
+<li>The <code>ForwardIterator</code> value type is convertible to the value type of the <code>OutputIterator</code> (only for <code>compute_positional_errors2</code>)</li>
+<li>The <code>ForwardIterator</code> value type is convertible to <code>double</code> (only for <code>compute_positional_error_statistics</code>)</li>
+<li>The ranges <code>[original_first, original_last)</code> and <code>[simplified_first, simplified_last)</code> contain vertex coordinates in multiples of <code>DIM</code>, f.e.: x, y, z, x, y, z, x, y, z when <code>DIM</code> = 3</li>
+<li>The ranges <code>[original_first, original_last)</code> and <code>[simplified_first, simplified_last)</code> contain a minimum of 2 vertices</li>
+<li>The range <code>[simplified_first, simplified_last)</code> represents a simplification of the range <code>[original_first, original_last)</code>, meaning each point in the simplification has the exact same coordinates as some point from the original polyline.</li>
+</ol>
+
+<h2>Implementation Details</h2>
+
+<p>The algorithm is implemented using two nested loops. The outer loop processes
+each line segment from the simplification. The inner loop processes each point
+of the original polyline, computing the perpendicular distance to the current
+line segment. The inner loop ends when a point exactly matches the coordinates
+of the end point from the line segment.</p>
+
+<p>When the outer loop has finished processing all line segments from the
+simplification, the last point from that simplified polyline should exactly match
+the last processed point from the original polyline. Only if this condition holds
+are the calculated positional errors considered valid. This means I can only say
+if the results are valid after I am done computing and copying errors to the
+output range. So I needed some way of letting the caller know this. One option
+would be to throw an exception. However, I designed <b class="proj">psimpl</b>
+to not itself throw any exceptions (see documentation section <b>The code</b>).
+Instead I opted for the optional <code><span class="keyword">boolean</span></code>
+ argument <code>valid</code>.</p>
+
+<h2>Usage</h2>
+
+<pre>std::vector &lt;<span class="keyword">double</span>&gt; original;   <span class="comment">// original polyline, assume not empty</span>
+std::vector &lt;<span class="keyword">double</span>&gt; simplified; <span class="comment">// simplified polyline, assume not empty</span>
+std::vector &lt;<span class="keyword">double</span>&gt; errors;     <span class="comment">// calculated errors</span>
+<span class="keyword">bool</span> valid = false;              <span class="comment">// indicates if the calculated errors are valid</span>
+
+<span class="comment">// compute the squared positional error for</span>
+<span class="comment">// each point of the original 2d polyline</span>
+psimpl::<span class="algorithm">compute_positional_errors2</span> &lt;2&gt; (
+    original.begin (), original.end (),
+    simplified.begin (), simplified.end (),
+    std::back_inserter (errors), &amp;valid);
+
+<span class="comment">// compute positional error statistics for</span>
+<span class="comment">// all points of the original 2d polyline</span>
+psimpl::math::Statistics stats =
+    psimpl::<span class="algorithm">compute_positional_error_statistics</span> &lt;2&gt; (
+        original.begin (), original.end (),
+        simplified.begin (), simplified.end (),
+        &amp;valid);</pre>
+
+    </div>
+    <div id="footer">Copyright &copy; 2010-2011 <a title="Contact address" href="mailto:edekoning@gmail.com?subject=psimpl">Elmar de Koning</a>. All Rights Reserved.</div>
+</div>
+</body>
+</html>
+

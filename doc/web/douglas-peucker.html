@@ -1,0 +1,244 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="Content-Type">
+  <meta name="description" content="Douglas-Peucker algorithm for polyline simplification">
+  <meta name="keywords" content="Douglas-Peucker, algorithm, psimpl, polyline, simplification, library, c++, simplify, reduce, decimate, approximate">
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <title>psimpl - Douglas-Peucker simplification</title>
+</head>
+<body>
+<div id="main_container">
+    <div id="header">
+        <div id="title"><h1>psimpl</h1></div>
+        <div id="sub_title"><h2>generic n-dimensional poyline simplification</h2></div>
+        <div id="nav">
+            <a title="Home" href="index.html">Home</a>
+            <a title="News" href="news.html">News</a>
+            <a title="Documentation" href="documentation.html">Documentation</a>
+            <a title="Downloads" href="downloads.html">Download</a>
+        </div>
+    </div>
+    <div id="sidebar">
+        <div>
+            <span>Simplification:</span>
+            <ul>
+                <li><a title="Nth Point" href="nth-point.html">Nth Point</a></li>
+                <li><a title="Radial Distance" href="radial-distance.html">Radial Distance</a></li>
+                <li><a title="Perpendicular Distance" href="perpendicular-distance.html">Perpendicular Distance</a></li>
+                <li><a title="Reumann-Witkam" href="reumann-witkam.html">Reumann-Witkam</a></li>
+                <li><a title="Opheim" href="opheim.html">Opheim</a></li>
+                <li><a title="Lang" href="lang.html">Lang</a></li>
+                <li><a title="Douglas-Peucker" href="douglas-peucker.html">Douglas-Peucker</a></li>
+            </ul>
+        </div>
+        <div>
+            <span>Errors:</span>
+            <ul>
+                <li><a title="Positional Errors" href="positional-errors.html">Positional</a></li>
+            </ul>
+        </div>
+    </div>
+    <div id="content">
+    
+<h1>Douglas-Peucker</h1>
+
+<p>The <b class="algo">Douglas-Peucker</b> algorithm uses a point-to-edge
+distance tolerance. The algorithm starts with a crude simplification that is the
+single edge joining the first and last vertices of the original polyline. It then
+computes the distance of all intermediate vertices to that edge. The vertex that
+is furthest away from that edge, and that has a computed distance that is larger
+than a specified tolerance, will be marked as a key and added to the simplification.
+This process will recurse for each edge in the current simplification, until all
+vertices of the original polyline are within tolerance of the simplification results.
+This process is illustrated below:</p>
+
+<div class="img"><img title="Douglas-Peucker simplification" alt="Douglas-Peucker simplification example" src="images/psimpl_dp.png"></div>
+
+<p>Initially, the simplification consists of a single edge. During the first step,
+the fourth vertex is marked as a key and the simplification is adjusted accordingly.
+During the second step, the first edge of the current simplification is processed.
+The maximum vertex distance to that edge falls below the tolerance threshold, and
+no new key is added. During the third step, a key is found for the second edge of
+the current simplification. This edge is split at the key and the simplification
+is updated. This process continues until no more keys can be found. Note that at
+each step, only one edge of the current simplification is processed.</p>
+
+<p>This algorithm has a worst case running time of O(nm), and O(n log m) on average,
+where m is the size of the simplified polyline. As such, this is an output dependent
+algorithm, and will be very fast when m is small. To make it even faster, the
+<b class="algo">Radial Distance</b> routine is applied as a pre-processing step.</p>
+
+<h2>Interface</h2>
+
+<pre><span class="keyword">template</span> &lt;<span class="keyword">unsigned</span> DIM, <span class="keyword">class</span> ForwardIterator, <span class="keyword">class</span> OutputIterator&gt;
+OutputIterator <span class="algorithm">simplify_douglas_peucker</span> (
+    ForwardIterator first,
+    ForwardIterator last,
+    <span class="keyword">typename</span> std::iterator_traits &lt;ForwardIterator&gt;::value_type tol,
+    OutputIterator result)</pre>
+
+<p>Applies the <b class="algo">Radial Distance</b> routine followed by
+<b class="algo">Douglas-Peucker</b> approximation to the range
+<code>[first, last)</code> using the specified tolerance <code>tol</code>.
+The resulting simplified polyline is copied to the output range
+<code>[result, result + m * DIM)</code>, where <em>m</em> is the number of
+vertices of the simplified polyline. The return value is the end of the output
+range: <code>result + m * DIM</code>.</p>
+
+<h2>Input (Type) Requirements</h2>
+
+<ol>
+<li><code>DIM</code> is not 0, where <code>DIM</code> represents the dimension of the polyline</li>
+<li>The <code>ForwardIterator</code> value type is convertible to the value type of the <code>OutputIterator</code></li>
+<li>The range <code>[first, last)</code> contains vertex coordinates in multiples of <code>DIM</code>, e.g.: x, y, z, x, y, z, x, y, z when <code>DIM</code> = 3</li>
+<li>The range <code>[first, last)</code> contains at least 2 vertices</li>
+<li><code>tol</code> is not 0.</li>
+</ol>
+
+<p>In case these requirements are not met, the entire input range
+<code>[first, last)</code> is copied to the output range 
+<code>[result, result + (last - first))</code>, <b>or</b> compile errors may
+occur.</p> 
+
+<h2>Implementation Details</h2>
+
+<p>Initially, my focus was on limiting the memory usage of the algorithms. So
+instead of using output iterators, all algorithms returned a
+<code>std::vector&lt;<span class="keyword">bool</span>&gt;</code>. One boolean
+for each vertex that determined if that vertex is a key and thus part of the
+simplification. This list of key markers could be used as input for another
+algorithm, allowing different algorithms to be run in sequence. A separate
+function could optionally copy all keys to some output range.</p>
+
+<p>This approach worked, but had some serious drawbacks:</p>
+
+<ul>
+<li>The code was slow, especially for non-random access iterators</li>
+<li>The code had become too complex with all its bookkeeping</li>
+<li>When using the code, I always needed a real copy of the simplification results and not a bunch of key markers</li>
+</ul>
+
+<p>The first thing I changed was the interface of each algorithm. Instead of
+returning key markers, the simplification results were copied to an output range
+using output iterators. The second change was to store the intermediate result
+produced by the <b class="algo">Radial Distance</b> pre-processing step in a
+plain C-style array. This array is then used during <b class="algo">Douglas-Peucker</b>
+approximation. The advantages of this approach far outweigh the increase in memory usage:</p>
+
+<ul>
+<li>Using the <b class="algo">Radial Distance</b> routine as a pre-processing step became trivial; I only had to create an array and specify an output iterator for it</li>
+<li>Less code - lack of specific code for different iterator categories, and less bookkeeping</li>
+<li>Faster code - working with C-style arrays and value type pointers is generally faster than using iterators, especially when dealing with non-random access iterators</li>
+<li>Cleaner interface</li>
+</ul>
+
+<p>The algorithm itself is a straightforward loop. The initial edge of the
+simplification is added to a <code>std::stack</code>. As long as the stack is
+not empty, an edge is popped and processed. Its key and key-edge distance are
+calculated. If the computed distance is larger than the tolerance, the key is
+added to the simplification. The edge is split and both sub-edges are added to
+the stack. When a vertex is added to the simplification, it is only marked as
+being a key. When the algorithm has finished, all marked vertices (keys) are
+copied to the output range.</p>
+
+<h2>Usage</h2>
+
+<pre><span class="keyword">double</span> tolerance = 10;        <span class="comment">// point-to-edge distance tolerance</span>
+std::deque &lt;<span class="keyword">double</span>&gt; polyline; <span class="comment">// original polyline, assume not empty</span>
+
+<span class="comment">// make sure the result array is large enough</span>
+<span class="keyword">double</span>* result = <span class="keyword">new double</span> [polyline.size ()];
+
+<span class="comment">// simplify the 3d polyline</span>
+psimpl::<span class="algorithm">simplify_douglas_peucker</span> &lt;3&gt; (
+    polyline.begin (), polyline.end (),
+    tolerance, result);</pre>
+
+<p>This example demonstrates that input and output containers do not have to be the same.</p>
+
+<hr>
+
+<h1>Douglas-Peucker N</h1>
+
+<p>This algorithm is a variation of the original implementation. Its key differences are:</p>
+
+<ul>
+<li>A point count tolerance is used instead of a point-to-edge distance tolerance. This allows you to specify the exact number of vertices in the simplified polyline. With the original implementation, you can never be sure how many vertices will remain.</li>
+<li>Instead of processing a single edge at a time (chosen pseudo random), all edges of the current simplified polyline are considered simultaneously. Each of these edges may define a new key. From all these possible keys, the one with the highest point-to-edge distance is chosen as the new key.</li>
+</ul>
+
+<p>A direct result from always choosing the next key based on all possible keys
+at any given time, is that the simplification results are of a higher quality.
+This is most notable when using a very low point-count tolerance. A downside is
+that we cannot use the <b class="algo">Radial Distance</b> routine as a
+pre-processing step to speed up the algorithm.</p>
+
+<h2>Interface</h2>
+
+<pre><span class="keyword">template</span> &lt;<span class="keyword">unsigned</span> DIM, <span class="keyword">class</span> ForwardIterator, <span class="keyword">class</span> OutputIterator&gt;
+OutputIterator <span class="algorithm">simplify_douglas_peucker_n</span> (
+    ForwardIterator first,
+    ForwardIterator last,
+    <span class="keyword">unsigned</span> count,
+    OutputIterator result)</pre>
+
+<p>Applies a variant of the <b class="algo">Douglas-Peucker</b> algorithm to
+the range <code>[first, last)</code>. The resulting simplified polyline consists
+of <code>count</code> vertices, and is copied to the output range
+<code>[result, result + count)</code>. The return value is the end of the output
+range: <code>result + count</code>.</p>
+
+<h2>Input (Type) Requirements</h2>
+
+<ol>
+<li><code>DIM</code> is not 0, where <code>DIM</code> represents the dimension of the polyline</li>
+<li>The <code>ForwardIterator</code> value type is convertible to the value type of the <code>OutputIterator</code></li>
+<li>The range <code>[first, last)</code> contains vertex coordinates in multiples of <code>DIM</code>, e.g.: x, y, z, x, y, z, x, y, z when <code>DIM</code> = 3</li>
+<li>The range <code>[first, last)</code> contains a minimum of <code>count</code> vertices</li>
+<li><code>count</code> is at least 2</li>
+</ol>
+
+<p>In case these requirements are not met, the entire input range
+<code>[first, last)</code> is copied to the output range 
+<code>[result, result + (last - first))</code>, <b>or</b> compile errors may
+occur.</p> 
+
+<h2>Implementation Details</h2>
+
+<p>The implementation for this variant varies only slightly from the original
+implementation. The main differences being that there is no pre-processing step,
+and in the way the edges of the current simplification are processed.</p>
+
+<p>For each edge that is added to the current simplification, its key is calculated.
+This key, alongside the edge and its distance to that edge, are stored in a
+<code>std::priority_queue</code>. This queue ensures that its top element contains
+the key with the maximum point-edge distance. As long as the simplification does
+not contain the desired amount of points, the top element from the queue is popped
+and its key is added to the simplification. The corresponding edge is split, and
+the two sub-edges are processed and stored in the queue.</p>
+
+<p>For performance reasons, a copy is made of the input polyline in a plain C-style
+array. Note that for the original implementation, this copy was made automatically
+during the <b class="algo">Radial Distance</b> pre-processing step.</p>
+
+<h2>Usage</h2>
+
+<pre><span class="keyword">unsigned</span> tolerance = 25;     <span class="comment">// point count tolerance</span>
+std::list &lt;<span class="keyword">long</span>&gt; polyline;   <span class="comment">// original polyline, assume not empty</span>
+std::vector &lt;<span class="keyword">double</span>&gt; result; <span class="comment">// resulting simplified polyline</span>
+
+<span class="comment">// simplify the 4d polyline to 25 points</span>
+psimpl::<span class="algorithm">simplify_douglas_peucker_n</span> &lt;4&gt; (
+    polyline.begin (), polyline.end (),
+    tolerance, std::back_inserter (result));</pre>
+
+<p>This example demonstrates the use of a non-random access container with a
+signed integer data type.</p>
+
+    </div>
+    <div id="footer">Copyright &copy; 2010-2011 <a title="Contact address" href="mailto:edekoning@gmail.com?subject=psimpl">Elmar de Koning</a>. All Rights Reserved.</div>
+</div>
+</body>
+</html>
+
