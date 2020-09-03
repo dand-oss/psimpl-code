@@ -1,0 +1,32 @@
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+
+# Provide version information
+set(@PROJECT_NAME@_VERSION @PROJECT_VERSION@)
+
+# Since psimpl is a header-only library with C++11 requirement,
+# we should ensure the compiler supports it
+include(CheckCXXCompilerFlag)
+check_cxx_compiler_flag("-std=c++11" COMPILER_SUPPORTS_CXX11)
+check_cxx_compiler_flag("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
+
+if(NOT COMPILER_SUPPORTS_CXX11 AND NOT COMPILER_SUPPORTS_CXX0X)
+    message(WARNING "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support required by @PROJECT_NAME@.")
+endif()
+
+# Include the exported targets
+include("${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@Targets.cmake")
+
+# Check that all required components are available
+check_required_components("@PROJECT_NAME@")
+
+# Provide some useful variables for users
+set(@PROJECT_NAME@_FOUND TRUE)
+set(@PROJECT_NAME@_INCLUDE_DIRS "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_INCLUDEDIR@")
+
+# Optional: Print configuration message if requested
+if(@PROJECT_NAME@_FIND_VERBOSE OR @PROJECT_NAME@_DEBUG)
+    message(STATUS "Found @PROJECT_NAME@: ${@PROJECT_NAME@_VERSION}")
+    message(STATUS "  Include directory: ${@PROJECT_NAME@_INCLUDE_DIRS}")
+endif()
