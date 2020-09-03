@@ -95,14 +95,14 @@ namespace psimpl {
         {
             // convert
             emit SignalConvertingPolyline ();
-            float* generatedPoints = new float [mGeneratedCoords.size ()];
+            auto* generatedPoints = new double [mGeneratedCoords.size ()];
             for (int c=0; c<mGeneratedCoords.size (); c++) {
                 generatedPoints [c] = mGeneratedCoords [c];
             }
             // simplify
             emit SignalSimplifyingPolyline ();
-            const float* begin = generatedPoints;
-            const float* end = generatedPoints + mGeneratedCoords.size ();
+            const auto* begin = generatedPoints;
+            const auto* end = generatedPoints + mGeneratedCoords.size ();
             t.start ();
             simplify_nth_point <2> (begin, end, n,
                                     std::back_inserter (mSimplifiedCoords));
@@ -145,8 +145,8 @@ namespace psimpl {
             // convert
             emit SignalConvertingPolyline ();
             std::list <long long> generatedPoints;
-            foreach (double coord, mGeneratedCoords) {
-                generatedPoints.push_back (coord);
+            for (auto coord : mGeneratedCoords) {
+                generatedPoints.push_back (static_cast<long long>(coord));
             }
             // simplify
             emit SignalSimplifyingPolyline ();
@@ -176,14 +176,14 @@ namespace psimpl {
         {
             // convert
             emit SignalConvertingPolyline ();
-            float* generatedPoints = new float [mGeneratedCoords.size ()];
+            auto* generatedPoints = new double [mGeneratedCoords.size ()];
             for (int c=0; c<mGeneratedCoords.size (); c++) {
                 generatedPoints [c] = mGeneratedCoords [c];
             }
             // simplify
             emit SignalSimplifyingPolyline ();
-            const float* begin = generatedPoints;
-            const float* end = generatedPoints + mGeneratedCoords.size ();
+            const auto* begin = generatedPoints;
+            const auto* end = generatedPoints + mGeneratedCoords.size ();
             t.start ();
             simplify_radial_distance <2> (begin, end, tol.toFloat(),
                                           std::back_inserter (mSimplifiedCoords));
@@ -226,8 +226,8 @@ namespace psimpl {
             // convert
             emit SignalConvertingPolyline ();
             std::list <long long> generatedPoints;
-            foreach (double coord, mGeneratedCoords) {
-                generatedPoints.push_back (coord);
+            for (auto coord : mGeneratedCoords) {
+                generatedPoints.push_back (static_cast<long long>(coord));
             }
             // simplify
             emit SignalSimplifyingPolyline ();
@@ -257,14 +257,14 @@ namespace psimpl {
         {
             // convert
             emit SignalConvertingPolyline ();
-            float* generatedPoints = new float [mGeneratedCoords.size ()];
+            auto* generatedPoints = new double [mGeneratedCoords.size ()];
             for (int c=0; c<mGeneratedCoords.size (); c++) {
                 generatedPoints [c] = mGeneratedCoords [c];
             }
             // simplify
             emit SignalSimplifyingPolyline ();
-            const float* begin = generatedPoints;
-            const float* end = generatedPoints + mGeneratedCoords.size ();
+            const auto* begin = generatedPoints;
+            const auto* end = generatedPoints + mGeneratedCoords.size ();
             t.start ();
             simplify_perpendicular_distance <2> (begin, end, tol.toFloat(), repeat,
                                                  std::back_inserter (mSimplifiedCoords));
@@ -307,8 +307,8 @@ namespace psimpl {
             // convert
             emit SignalConvertingPolyline ();
             std::list <long long> generatedPoints;
-            foreach (double coord, mGeneratedCoords) {
-                generatedPoints.push_back (coord);
+            for (auto coord : mGeneratedCoords) {
+                generatedPoints.push_back (static_cast<long long>(coord));
             }
             // simplify
             emit SignalSimplifyingPolyline ();
@@ -339,14 +339,14 @@ namespace psimpl {
         {
             // convert
             emit SignalConvertingPolyline ();
-            float* generatedPoints = new float [mGeneratedCoords.size ()];
+            auto* generatedPoints = new double [mGeneratedCoords.size ()];
             for (int c=0; c<mGeneratedCoords.size (); c++) {
                 generatedPoints [c] = mGeneratedCoords [c];
             }
             // simplify
             emit SignalSimplifyingPolyline ();
-            const float* begin = generatedPoints;
-            const float* end = generatedPoints + mGeneratedCoords.size ();
+            const auto* begin = generatedPoints;
+            const auto* end = generatedPoints + mGeneratedCoords.size ();
             t.start ();
             simplify_reumann_witkam <2> (begin, end, tol.toFloat(),
                                          std::back_inserter (mSimplifiedCoords));
@@ -389,8 +389,8 @@ namespace psimpl {
             // convert
             emit SignalConvertingPolyline ();
             std::list <long long> generatedPoints;
-            foreach (double coord, mGeneratedCoords) {
-                generatedPoints.push_back (coord);
+            for (auto coord : mGeneratedCoords) {
+                generatedPoints.push_back (static_cast<long long>(coord));
             }
             // simplify
             emit SignalSimplifyingPolyline ();
@@ -420,14 +420,14 @@ namespace psimpl {
         {
             // convert
             emit SignalConvertingPolyline ();
-            float* generatedPoints = new float [mGeneratedCoords.size ()];
+            auto* generatedPoints = new double [mGeneratedCoords.size ()];
             for (int c=0; c<mGeneratedCoords.size (); c++) {
                 generatedPoints [c] = mGeneratedCoords [c];
             }
             // simplify
             emit SignalSimplifyingPolyline ();
-            const float* begin = generatedPoints;
-            const float* end = generatedPoints + mGeneratedCoords.size ();
+            const auto* begin = generatedPoints;
+            const auto* end = generatedPoints + mGeneratedCoords.size ();
             t.start ();
             simplify_opheim <2> (begin, end, minTol.toFloat(), maxTol.toFloat(),
                                  std::back_inserter (mSimplifiedCoords));
@@ -470,8 +470,8 @@ namespace psimpl {
             // convert
             emit SignalConvertingPolyline ();
             std::list <long long> generatedPoints;
-            foreach (double coord, mGeneratedCoords) {
-                generatedPoints.push_back (coord);
+            for (auto coord : mGeneratedCoords) {
+                generatedPoints.push_back (static_cast<long long>(coord));
             }
             // simplify
             emit SignalSimplifyingPolyline ();
@@ -501,14 +501,14 @@ namespace psimpl {
         {
             // convert
             emit SignalConvertingPolyline ();
-            float* generatedPoints = new float [mGeneratedCoords.size ()];
+            auto* generatedPoints = new double [mGeneratedCoords.size ()];
             for (int c=0; c<mGeneratedCoords.size (); c++) {
                 generatedPoints [c] = mGeneratedCoords [c];
             }
             // simplify
             emit SignalSimplifyingPolyline ();
-            const float* begin = generatedPoints;
-            const float* end = generatedPoints + mGeneratedCoords.size ();
+            const auto* begin = generatedPoints;
+            const auto* end = generatedPoints + mGeneratedCoords.size ();
             t.start ();
             simplify_lang <2> (begin, end, tol.toFloat(), size,
                                std::back_inserter (mSimplifiedCoords));
@@ -551,8 +551,8 @@ namespace psimpl {
             // convert
             emit SignalConvertingPolyline ();
             std::list <long long> generatedPoints;
-            foreach (double coord, mGeneratedCoords) {
-                generatedPoints.push_back (coord);
+            for (auto coord : mGeneratedCoords) {
+                generatedPoints.push_back (static_cast<long long>(coord));
             }
             // simplify
             emit SignalSimplifyingPolyline ();
@@ -582,14 +582,14 @@ namespace psimpl {
         {
             // convert
             emit SignalConvertingPolyline ();
-            float* generatedPoints = new float [mGeneratedCoords.size ()];
+            auto* generatedPoints = new double [mGeneratedCoords.size ()];
             for (int c=0; c<mGeneratedCoords.size (); c++) {
                 generatedPoints [c] = mGeneratedCoords [c];
             }
             // simplify
             emit SignalSimplifyingPolyline ();
-            const float* begin = generatedPoints;
-            const float* end = generatedPoints + mGeneratedCoords.size ();
+            const auto* begin = generatedPoints;
+            const auto* end = generatedPoints + mGeneratedCoords.size ();
             t.start ();
             simplify_douglas_peucker_classic <2> (begin, end, tol.toFloat(),
                                                   std::back_inserter (mSimplifiedCoords));
@@ -632,8 +632,8 @@ namespace psimpl {
             // convert
             emit SignalConvertingPolyline ();
             std::list <long long> generatedPoints;
-            foreach (double coord, mGeneratedCoords) {
-                generatedPoints.push_back (coord);
+            for (auto coord : mGeneratedCoords) {
+                generatedPoints.push_back (static_cast<long long>(coord));
             }
             // simplify
             emit SignalSimplifyingPolyline ();
@@ -663,14 +663,14 @@ namespace psimpl {
         {
             // convert
             emit SignalConvertingPolyline ();
-            float* generatedPoints = new float [mGeneratedCoords.size ()];
+            auto* generatedPoints = new double [mGeneratedCoords.size ()];
             for (int c=0; c<mGeneratedCoords.size (); c++) {
                 generatedPoints [c] = mGeneratedCoords [c];
             }
             // simplify
             emit SignalSimplifyingPolyline ();
-            const float* begin = generatedPoints;
-            const float* end = generatedPoints + mGeneratedCoords.size ();
+            const auto* begin = generatedPoints;
+            const auto* end = generatedPoints + mGeneratedCoords.size ();
             t.start ();
             simplify_douglas_peucker <2> (begin, end, tol.toFloat(),
                                           std::back_inserter (mSimplifiedCoords));
@@ -713,8 +713,8 @@ namespace psimpl {
             // convert
             emit SignalConvertingPolyline ();
             std::list <long long> generatedPoints;
-            foreach (double coord, mGeneratedCoords) {
-                generatedPoints.push_back (coord);
+            for (auto coord : mGeneratedCoords) {
+                generatedPoints.push_back (static_cast<long long>(coord));
             }
             // simplify
             emit SignalSimplifyingPolyline ();
@@ -744,14 +744,14 @@ namespace psimpl {
         {
             // convert
             emit SignalConvertingPolyline ();
-            float* generatedPoints = new float [mGeneratedCoords.size ()];
+            auto* generatedPoints = new double [mGeneratedCoords.size ()];
             for (int c=0; c<mGeneratedCoords.size (); c++) {
                 generatedPoints [c] = mGeneratedCoords [c];
             }
             // simplify
             emit SignalSimplifyingPolyline ();
-            const float* begin = generatedPoints;
-            const float* end = generatedPoints + mGeneratedCoords.size ();
+            const auto* begin = generatedPoints;
+            const auto* end = generatedPoints + mGeneratedCoords.size ();
             t.start ();
             simplify_douglas_peucker_n <2> (begin, end, count,
                                             std::back_inserter (mSimplifiedCoords));
@@ -794,8 +794,8 @@ namespace psimpl {
             // convert
             emit SignalConvertingPolyline ();
             std::list <long long> generatedPoints;
-            foreach (double coord, mGeneratedCoords) {
-                generatedPoints.push_back (coord);
+            for (auto coord : mGeneratedCoords) {
+                generatedPoints.push_back (static_cast<long long>(coord));
             }
             // simplify
             emit SignalSimplifyingPolyline ();
@@ -854,10 +854,10 @@ namespace psimpl {
                 mSimplifiedCoords.constBegin (), mSimplifiedCoords.constEnd (), &validStatistics);
 
         if (validStatistics) {
-            emit SignalSimplifiedPolyline (duration, mSimplifiedCoords, stats.max, stats.sum, stats.mean, stats.std);
+            emit SignalSimplifiedPolyline (static_cast<int>(duration), mSimplifiedCoords, stats.max, stats.sum, stats.mean, stats.std);
         }
         else {
-            emit SignalSimplifiedPolyline (duration, mSimplifiedCoords);
+            emit SignalSimplifiedPolyline (static_cast<int>(duration), mSimplifiedCoords);
         }
     }
 } // namespace psimpl
