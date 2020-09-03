@@ -32,7 +32,7 @@
 */
 
 #include "RenderArea.h"
-#include <QtGui/QPainter>
+#include <QPainter>
 
 
 namespace psimpl {

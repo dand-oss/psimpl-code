@@ -35,8 +35,8 @@
 #define RENDERAREA_H
 
 
-#include <QtGui/QFrame>
-#include <QtGui/QPainterPath>
+#include <QFrame>
+#include <QPainterPath>
 
 
 namespace psimpl {
