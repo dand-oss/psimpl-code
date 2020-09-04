@@ -35,7 +35,8 @@
 #define MAINWINDOW_H
 
 
-#include <QMainWindow>
+#include <QMainWindow> // base
+#include <memory> // std::unique_ptr
 
 
 namespace Ui {
@@ -82,8 +83,8 @@ namespace psimpl {
         void DisableButtons ();
 
     private:
-        Ui::MainWindow *ui;
-        DPWorker* mWorker;
+        std::unique_ptr<Ui::MainWindow> ui;
+        std::unique_ptr<DPWorker> mWorker;
 
 private slots:
     void on_simplifiedPolylineCheckBox_toggled(bool checked);

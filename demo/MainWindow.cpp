@@ -44,11 +44,11 @@
 
 namespace psimpl {
 
-    MainWindow::MainWindow (QWidget *parent) :
-        QMainWindow (parent),
-        ui (new Ui::MainWindow)
+    MainWindow::MainWindow (QWidget *parent)
+        : QMainWindow (parent)
+        , ui(std::make_unique<Ui::MainWindow>())
     {
-        mWorker = new DPWorker (this);
+        mWorker = std::make_unique<DPWorker>(this);
 
         ui->setupUi (this);
         ui->polyTypeComboBox->setCurrentIndex(VECTOR_DOUBLE);
@@ -57,43 +57,43 @@ namespace psimpl {
         ui->algorithmComboBox->removeItem (DOUGLAS_PEUCKER_REFERENCE);
 #endif
         auto rc = connect(
-            mWorker,
+            mWorker.get(),
             &DPWorker::SignalGeneratingPolyline,
             this,
             &MainWindow::SlotGeneratingPolyline);
         if ( !rc ) throw std::runtime_error("could not connect");
         rc = connect(
-            mWorker,
+            mWorker.get(),
             &DPWorker::SignalConvertingPolyline,
             this,
             &MainWindow::SlotConvertingPolyline);
         if ( !rc ) throw std::runtime_error("could not connect");
         rc = connect(
-            mWorker,
+            mWorker.get(),
             &DPWorker::SignalSimplifyingPolyline,
             this,
             &MainWindow::SlotSimplifyingPolyline);
         if ( !rc ) throw std::runtime_error("could not connect");
         rc = connect(
-            mWorker,
+            mWorker.get(),
             &DPWorker::SignalCleaningConvertedPolyline,
             this,
             &MainWindow::SlotCleaningConvertedPolyline);
         if ( !rc ) throw std::runtime_error("could not connect");
         rc = connect(
-            mWorker,
+            mWorker.get(),
             &DPWorker::SignalGeneratedPolyline,
             this,
             &MainWindow::SlotGeneratedPolyline);
         if ( !rc ) throw std::runtime_error("could not connect");
         rc = connect(
-            mWorker,
+            mWorker.get(),
             qOverload<int, QVector <qreal>&>(&DPWorker::SignalSimplifiedPolyline),
             this,
             qOverload<int, QVector <qreal>&>(&MainWindow::SlotSimplifiedPolyline));
         if ( !rc ) throw std::runtime_error("could not connect");
         rc = connect(
-            mWorker,
+            mWorker.get(),
             qOverload<int, QVector <qreal>&, double, double, double, double>(
                 &DPWorker::SignalSimplifiedPolyline),
             this,
@@ -104,8 +104,6 @@ namespace psimpl {
 
     MainWindow::~MainWindow ()
     {
-        delete ui;
-        delete mWorker;
     }
 
     void MainWindow::changeEvent (QEvent *e)
