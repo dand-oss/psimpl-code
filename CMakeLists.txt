@@ -9,6 +9,13 @@ project(
 
 set(libname "psimpl")
 
+###############
+# ASI default settings
+list(APPEND CMAKE_MODULE_PATH "$ENV{ASV_CMAKE}")
+include(asv_cmake_defaults)
+asv_cmake_defaults( )
+###############
+
 add_library(${libname} INTERFACE)
 # add alias so the project can be uses with add_subdirectory
 add_library(${libname}::${libname} ALIAS ${libname})

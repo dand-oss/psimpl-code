@@ -3,6 +3,16 @@ project(psimpl-demo  CXX)
 
 set(exename "psimpl-demo")
 
+###############
+# ASI default settings
+list(APPEND CMAKE_MODULE_PATH "$ENV{ASV_CMAKE}")
+include(asv_cmake_defaults)
+asv_cmake_defaults( )
+###############
+
+# use our QT
+set(QT_LIBINFIX "ASV")
+
 include(GNUInstallDirs)
 
 # use our own library - installed 
@@ -12,6 +22,12 @@ find_package(Qt5 CONFIG REQUIRED COMPONENTS
     Gui
     Widgets
 )
+
+asv_print_package_properties(
+    # psimpl::psimpl
+    Qt5::Gui
+    Qt5::Widgets
+    )
 
 # generate headers to binary dir from ui files
 qt5_wrap_ui(

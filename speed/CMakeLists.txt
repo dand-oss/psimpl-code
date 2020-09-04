@@ -3,6 +3,16 @@ project(psimpl-speed  CXX)
 
 set(exename "psimpl-speed")
 
+###############
+# ASI default settings
+list(APPEND CMAKE_MODULE_PATH "$ENV{ASV_CMAKE}")
+include(asv_cmake_defaults)
+asv_cmake_defaults( )
+###############
+
+# use our QT
+set(QT_LIBINFIX "ASV")
+
 include(GNUInstallDirs)
 
 # use our own library - installed 
