@@ -34,7 +34,7 @@
 
 #include "TestUtil.h"
 #include "test.h"
-#include "../lib/psimpl.h"
+#include "psimpl.h"
 
 #include <list>
 #include <set>
