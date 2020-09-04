@@ -37,11 +37,8 @@
 
 namespace psimpl {
 
-    RenderArea::RenderArea (QWidget *inParent, Qt::WindowFlags inFlags) :
-        QFrame (inParent, inFlags),
-        mDrawGeneratedPolyline (true),
-        mDrawSimplifiedPolyline (false),
-        mKeepAspectRatio (true)
+    RenderArea::RenderArea (QWidget *inParent, Qt::WindowFlags inFlags)
+        : QFrame (inParent, inFlags)
     {
     }
 
