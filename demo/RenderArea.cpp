@@ -46,17 +46,19 @@ namespace psimpl {
     }
 
     void RenderArea::paintEvent(QPaintEvent * /*inEvent*/) {
-        if (!mGeneratedPolyline.elementCount ())
+        if (!mGeneratedPolyline.elementCount ()) {
             return;
+        }
 
         QRectF rect = mGeneratedPolyline.boundingRect ();
-        if (!rect.isValid ())
+        if (!rect.isValid ()) {
             return;
+        }
 
         QPainter painter (this);
 
         if (mKeepAspectRatio) {
-            qreal scale = qMin ((width () - 1) / rect.width (), (height () - 1) / rect.height ());
+            const auto scale = qMin ((width () - 1) / rect.width (), (height () - 1) / rect.height ());
             painter.translate ((width () - (rect.width () * scale)) / 2.0,
                                (height () - (rect.height () * scale)) / 2.0);
             painter.scale (scale, scale);
@@ -90,9 +92,9 @@ namespace psimpl {
         if (polyline.empty ()) {
             return path;
         }
-        int pointCount = polyline.size () / 2;
-        qreal skipStep = (qreal) (pointCount - threshold) / (qreal) threshold;
-        qreal skipValue = skipStep;
+        const auto pointCount = polyline.size () / 2;
+        const auto skipStep = (qreal) (pointCount - threshold) / (qreal) threshold;
+        auto skipValue = skipStep;
 
         path.moveTo(polyline [0], polyline [1]);
         for (int i=1; i<pointCount; i++) {
@@ -104,8 +106,6 @@ namespace psimpl {
                 skipValue += skipStep;
             }
         }
-        int elemCount = path.elementCount ();
-        elemCount++;
         return path;
     }
 
