@@ -608,7 +608,8 @@ namespace psimpl {
                     moved = util::forward <DIM> (next, static_cast <diff_type> (look_ahead), remaining);
                 }
                 else {
-                    util::backward <DIM> (next, 1, remaining);
+                    int iremaining = static_cast<int>(remaining) ; // pass by ref
+                    util::backward <DIM> (next, 1, iremaining);
                 }
             }
             return result;
