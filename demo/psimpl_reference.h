@@ -132,10 +132,11 @@ namespace psimpl {
         //            j,k = indices for the subchain v[j] to v[k]
         //    Output: mk[] = array of markers matching vertex array v[]
         void
-        simplifyDP( Stack& stack, double tol, Point* v, int j, int k, int* mk )
+        simplifyDP( Stack& stack, double tol, const std::vector<Point>& v, int j, int k, std::vector<int>& mk )
         {
-            if (k <= j+1) // there is nothing to simplify
+            if (k <= j+1) { // there is nothing to simplify
                 return;
+            }
 
             // check for adequate approximation by segment S from v[j] to v[k]
             int     maxi = j;          // index of vertex farthest from S
@@ -196,8 +197,8 @@ namespace psimpl {
         {
             int    i, k, m, pv;            // misc counters
             double  tol2 = tol * tol;      // tolerance squared
-            Point* vt = new Point[n];      // vertex buffer
-            int*   mk = new int[n];        // marker buffer
+            std::vector<Point> vt(n);      // vertex buffer
+            std::vector<int> mk(n);        // marker buffer
             for (i=0; i<n; i++) {
                 mk[i] = 0;
             }
@@ -205,13 +206,15 @@ namespace psimpl {
             // STAGE 1.  Vertex Reduction within tolerance of prior vertex cluster
             vt[0] = V[0];              // start at the beginning
             for (i=k=1, pv=0; i<n; i++) {
-                if (__d2(V[i], V[pv]) < tol2)
+                if (__d2(V[i], V[pv]) < tol2) {
                     continue;
+                }
                 vt[k++] = V[i];
                 pv = i;
             }
-            if (pv < n-1)
+            if (pv < n-1) {
                 vt[k++] = V[n-1];      // finish at the end
+            }
 
             // STAGE 2.  Douglas-Peucker polyline simplification
             mk[0] = mk[k-1] = 1;                    // mark the first and last vertices
@@ -225,11 +228,10 @@ namespace psimpl {
 
             // copy marked vertices to the output simplified polyline
             for (i=m=0; i<k; i++) {
-                if (mk[i])
+                if (mk[i]) {
                     sV[m++] = vt[i];
+                }
             }
-            delete vt;
-            delete mk;
             return m;         // m vertices in simplified polyline
         }
         //===================================================================
