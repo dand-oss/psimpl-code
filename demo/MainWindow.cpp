@@ -41,8 +41,14 @@
 #include <QToolButton>
 #include <QFileDialog>
 
-
 namespace psimpl {
+
+    // convert enum class to int
+    template <class EE>
+    auto to_underlying(EE e) noexcept
+    {
+        return static_cast<typename std::underlying_type_t<EE>>(e);
+    }
 
     MainWindow::MainWindow (QWidget *parent)
         : QMainWindow (parent)
@@ -51,10 +57,11 @@ namespace psimpl {
         mWorker = std::make_unique<DPWorker>(this);
 
         ui->setupUi (this);
-        ui->polyTypeComboBox->setCurrentIndex(VECTOR_DOUBLE);
+        ui->polyTypeComboBox->setCurrentIndex(
+                VECTOR_DOUBLE);
 
 #ifndef _DEBUG
-        ui->algorithmComboBox->removeItem (DOUGLAS_PEUCKER_REFERENCE);
+        ui->algorithmComboBox->removeItem (to_underlying(Algorithm::DOUGLAS_PEUCKER_REFERENCE));
 #endif
         auto rc = connect(
             mWorker.get(),
@@ -154,45 +161,45 @@ namespace psimpl {
         QApplication::setOverrideCursor (QCursor (Qt::WaitCursor));
         DisableButtons ();
 
-        switch (ui->algorithmComboBox->currentIndex ())
+        switch (static_cast<Algorithm>(ui->algorithmComboBox->currentIndex ()))
         {
-        case NTH_POINT:
+        case Algorithm::NTH_POINT:
             mWorker->SimplifyNP ((Container)ui->polyTypeComboBox->currentIndex (), ui->npSpinBox->value ());
             break;
 
-        case RADIAL_DISTANCE:
+        case Algorithm::RADIAL_DISTANCE:
             mWorker->SimplifyRD ((Container)ui->polyTypeComboBox->currentIndex (), ui->rdLineEdit->text ());
             break;
 
-        case PERPENDICULAR_DISTANCE:
+        case Algorithm::PERPENDICULAR_DISTANCE:
             mWorker->SimplifyPD ((Container)ui->polyTypeComboBox->currentIndex (), ui->pdLineEdit->text (), ui->pdSpinBox->value ());
             break;
 
-        case REUMANN_WITKAM:
+        case Algorithm::REUMANN_WITKAM:
             mWorker->SimplifyRW ((Container)ui->polyTypeComboBox->currentIndex (), ui->rwLineEdit->text ());
             break;
 
-        case OPHEIM:
+        case Algorithm::OPHEIM:
             mWorker->SimplifyOp ((Container)ui->polyTypeComboBox->currentIndex (), ui->opMinLineEdit->text (), ui->opMaxLineEdit->text ());
             break;
 
-        case LANG:
+        case Algorithm::LANG:
             mWorker->SimplifyLa ((Container)ui->polyTypeComboBox->currentIndex (), ui->laLineEdit->text (), ui->laLookAheadSpinBox->value ());
             break;
 
-        case DOUGLAS_PEUCKER_CLASSIC:
+        case Algorithm::DOUGLAS_PEUCKER_CLASSIC:
             mWorker->SimplifyDP_classic ((Container)ui->polyTypeComboBox->currentIndex (), ui->dpcLineEdit->text ());
             break;
 
-        case DOUGLAS_PEUCKER:
+        case Algorithm::DOUGLAS_PEUCKER:
             mWorker->SimplifyDP ((Container)ui->polyTypeComboBox->currentIndex (), ui->dpLineEdit->text ());
             break;
 
-        case DOUGLAS_PEUCKER_N:
+        case Algorithm::DOUGLAS_PEUCKER_N:
             mWorker->SimplifyDP_N ((Container)ui->polyTypeComboBox->currentIndex (), ui->dpvSpinBox->value ());
             break;
 
-        case DOUGLAS_PEUCKER_REFERENCE:
+        case Algorithm::DOUGLAS_PEUCKER_REFERENCE:
             mWorker->SimplifyDP_reference (ui->dprLineEdit->text ());
             break;
         }
@@ -200,7 +207,7 @@ namespace psimpl {
 
     void MainWindow::on_algorithmComboBox_currentIndexChanged (int index)
     {
-        if (index == DOUGLAS_PEUCKER_REFERENCE) {
+        if (index == to_underlying(Algorithm::DOUGLAS_PEUCKER_REFERENCE)) {
             ui->polyTypeComboBox->setDisabled (true);
         }
         else {
