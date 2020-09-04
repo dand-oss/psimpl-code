@@ -50,7 +50,7 @@ namespace psimpl {
             return;
         }
 
-        QRectF rect = mGeneratedPolyline.boundingRect ();
+        const auto& rect = mGeneratedPolyline.boundingRect ();
         if (!rect.isValid ()) {
             return;
         }
