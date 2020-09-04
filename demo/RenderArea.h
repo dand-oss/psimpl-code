@@ -65,9 +65,9 @@ namespace psimpl {
     private:
         QPainterPath mGeneratedPolyline;
         QPainterPath mSimplifiedPolyline;
-        bool mDrawGeneratedPolyline;
-        bool mDrawSimplifiedPolyline;
-        bool mKeepAspectRatio;
+        bool mDrawGeneratedPolyline { true };
+        bool mDrawSimplifiedPolyline { false };
+        bool mKeepAspectRatio { true };
     };
 
 } // namespace psimpl
