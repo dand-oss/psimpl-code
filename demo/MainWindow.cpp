@@ -36,6 +36,7 @@
 #include "DPWorker.h"
 #include <cmath>
 #include <limits>
+#include <stdexcept>
 #include <QTextStream>
 #include <QToolButton>
 #include <QFileDialog>
@@ -55,21 +56,50 @@ namespace psimpl {
 #ifndef _DEBUG
         ui->algorithmComboBox->removeItem (DOUGLAS_PEUCKER_REFERENCE);
 #endif
-        connect (mWorker, SIGNAL (SignalGeneratingPolyline ()),
-                 this, SLOT (SlotGeneratingPolyline ()));
-        connect (mWorker, SIGNAL (SignalConvertingPolyline ()),
-                 this, SLOT (SlotConvertingPolyline ()));
-        connect (mWorker, SIGNAL (SignalSimplifyingPolyline ()),
-                 this, SLOT (SlotSimplifyingPolyline ()));
-        connect (mWorker, SIGNAL (SignalCleaningConvertedPolyline ()),
-                 this, SLOT (SlotCleaningConvertedPolyline ()));
-
-        connect (mWorker, SIGNAL (SignalGeneratedPolyline (int, QVector <qreal>&)),
-                 this, SLOT (SlotGeneratedPolyline (int, QVector <qreal>&)));
-        connect (mWorker, SIGNAL (SignalSimplifiedPolyline (int, QVector <qreal>&)),
-                 this, SLOT (SlotSimplifiedPolyline (int, QVector <qreal>&)));
-        connect (mWorker, SIGNAL (SignalSimplifiedPolyline (int, QVector <qreal>&, double, double, double, double)),
-                 this, SLOT (SlotSimplifiedPolyline (int, QVector <qreal>&, double, double, double, double)));
+        auto rc = connect(
+            mWorker,
+            &DPWorker::SignalGeneratingPolyline,
+            this,
+            &MainWindow::SlotGeneratingPolyline);
+        if ( !rc ) throw std::runtime_error("could not connect");
+        rc = connect(
+            mWorker,
+            &DPWorker::SignalConvertingPolyline,
+            this,
+            &MainWindow::SlotConvertingPolyline);
+        if ( !rc ) throw std::runtime_error("could not connect");
+        rc = connect(
+            mWorker,
+            &DPWorker::SignalSimplifyingPolyline,
+            this,
+            &MainWindow::SlotSimplifyingPolyline);
+        if ( !rc ) throw std::runtime_error("could not connect");
+        rc = connect(
+            mWorker,
+            &DPWorker::SignalCleaningConvertedPolyline,
+            this,
+            &MainWindow::SlotCleaningConvertedPolyline);
+        if ( !rc ) throw std::runtime_error("could not connect");
+        rc = connect(
+            mWorker,
+            &DPWorker::SignalGeneratedPolyline,
+            this,
+            &MainWindow::SlotGeneratedPolyline);
+        if ( !rc ) throw std::runtime_error("could not connect");
+        rc = connect(
+            mWorker,
+            qOverload<int, QVector <qreal>&>(&DPWorker::SignalSimplifiedPolyline),
+            this,
+            qOverload<int, QVector <qreal>&>(&MainWindow::SlotSimplifiedPolyline));
+        if ( !rc ) throw std::runtime_error("could not connect");
+        rc = connect(
+            mWorker,
+            qOverload<int, QVector <qreal>&, double, double, double, double>(
+                &DPWorker::SignalSimplifiedPolyline),
+            this,
+            qOverload<int, QVector <qreal>&, double, double, double, double>(
+                &MainWindow::SlotSimplifiedPolyline));
+        if ( !rc ) throw std::runtime_error("could not connect");
     }
 
     MainWindow::~MainWindow ()
