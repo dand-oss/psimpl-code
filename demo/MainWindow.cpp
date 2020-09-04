@@ -372,7 +372,7 @@ namespace psimpl {
 
     void MainWindow::SlotSimplifiedPolyline (int duration, QVector <qreal>& polyline)
     {
-        int pointCount = polyline.count () / 2;
+        const auto pointCount = polyline.count () / 2;
         ui->maxValueLabel->setText ("-");
         ui->sumValueLabel->setText ("-");
         ui->meanValueLabel->setText ("-");
@@ -390,7 +390,7 @@ namespace psimpl {
 
     void MainWindow::SlotSimplifiedPolyline (int duration, QVector <qreal>& polyline, double max, double sum, double mean, double std)
     {
-        int pointCount = polyline.count () / 2;
+        const auto pointCount = polyline.count () / 2;
         ui->maxValueLabel->setText (QString::number (max));
         ui->sumValueLabel->setText (QString::number (sum));
         ui->meanValueLabel->setText (QString::number (mean));
