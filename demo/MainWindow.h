@@ -48,7 +48,7 @@ namespace psimpl {
 
     class DPWorker;
 
-    typedef enum ALGORITHM
+    enum class Algorithm
     {
         NTH_POINT,
         RADIAL_DISTANCE,
@@ -60,7 +60,7 @@ namespace psimpl {
         DOUGLAS_PEUCKER,
         DOUGLAS_PEUCKER_N,
         DOUGLAS_PEUCKER_REFERENCE,
-    } Algorithm;
+    } ;
 
     /*!
         \brief Mainwindow where polylines can be generated and simplified.
