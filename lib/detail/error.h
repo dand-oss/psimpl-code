@@ -94,7 +94,7 @@ namespace psimpl {
             stats.max = static_cast <double> (*std::max_element (first, last));
             stats.sum = static_cast <double> (std::accumulate (first, last, init));
             stats.mean = stats.sum / static_cast<double>(count);
-            std::transform (first, last, first, std::bind2nd (std::minus <value_type> (), stats.mean));
+            std::for_each(first, last, [&stats](auto& x) { x -= stats.mean; });
             stats.std = std::sqrt (static_cast <double> (std::inner_product (first, last, first, init)) / static_cast<double>(count));
             return stats;
         }
