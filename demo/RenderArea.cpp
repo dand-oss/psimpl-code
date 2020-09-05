@@ -37,16 +37,13 @@
 
 namespace psimpl {
 
-    RenderArea::RenderArea (QWidget *inParent, Qt::WindowFlags inFlags)
-        : QFrame (inParent, inFlags)
-    {
-    }
-
     void RenderArea::paintEvent(QPaintEvent * /*inEvent*/) {
+        // exit if no generated line
         if (!mGeneratedPolyline.elementCount ()) {
             return;
         }
 
+        // exit if no rect to paint
         const auto& rect = mGeneratedPolyline.boundingRect ();
         if (!rect.isValid ()) {
             return;
@@ -54,33 +51,38 @@ namespace psimpl {
 
         QPainter painter (this);
 
-        if (mKeepAspectRatio) {
-            const auto scale = qMin ((width () - 1) / rect.width (), (height () - 1) / rect.height ());
-            painter.translate ((width () - (rect.width () * scale)) / 2.0,
-                               (height () - (rect.height () * scale)) / 2.0);
-            painter.scale (scale, scale);
-            painter.translate (-rect.left (), -rect.top ());
+        // find width / height ratio
+        const auto scalew = ! mKeepAspectRatio
+            ? (width () - 1) / rect.width ()
+            : qMin(
+                (width () - 1) / rect.width (),
+                (height () - 1) / rect.height ());
+
+        if (! mKeepAspectRatio) {
+            painter.scale (scalew, (height () - 1) / rect.height ());
         }
         else {
-            painter.scale ((width () - 1) / rect.width (), (height () - 1) / rect.height ());
-            painter.translate (-rect.left (), -rect.top ());
+            painter.translate(
+                (width () - (rect.width () * scalew)) / 2.0,
+                (height () - (rect.height () * scalew)) / 2.0);
+            painter.scale (scalew, scalew);
         }
+        painter.translate (-rect.left (), -rect.top ());
 
+        // Draw the blue generated line
         if (mDrawGeneratedPolyline) {
-            painter.setPen (Qt::darkBlue);
+            painter.setPen (QPen(Qt::darkBlue, 1.0/scalew));
             painter.drawPath (mGeneratedPolyline);
         }
 
-        if (!mSimplifiedPolyline.elementCount ())
-            return;
-
-        if (mDrawSimplifiedPolyline) {
-            painter.setPen (Qt::darkRed);
+        // Draw the red simplified line
+        if (mDrawSimplifiedPolyline && mSimplifiedPolyline.elementCount ()) {
+            painter.setPen (QPen(Qt::darkRed, 1.0/scalew));
             painter.drawPath (mSimplifiedPolyline);
         }
     }
 
-    QPainterPath RenderArea::Convert (QVector <qreal>& polyline)
+    QPainterPath RenderArea::Convert (const QVector <qreal>& polyline)
     {
         // limit paths to max 100.000 points to speed up drawing
         const int threshold = 100000;
@@ -106,13 +108,13 @@ namespace psimpl {
         return path;
     }
 
-    void RenderArea::SetGeneratedPolyline (QVector <qreal>& polyline)
+    void RenderArea::SetGeneratedPolyline (const QVector <qreal>& polyline)
     {
         mSimplifiedPolyline = QPainterPath ();
         mGeneratedPolyline = Convert (polyline);
     }
 
-    void RenderArea::SetSimplifiedPolyline (QVector <qreal>& polyline)
+    void RenderArea::SetSimplifiedPolyline (const QVector <qreal>& polyline)
     {
         mSimplifiedPolyline = Convert (polyline);
     }

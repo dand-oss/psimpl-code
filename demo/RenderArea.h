@@ -49,9 +49,18 @@ namespace psimpl {
     class RenderArea : public QFrame
     {
     public:
-        RenderArea (QWidget *inParent = 0, Qt::WindowFlags inFlags = 0);
-        void SetGeneratedPolyline (QVector <qreal>& polyline);
-        void SetSimplifiedPolyline (QVector <qreal>& polyline);
+        RenderArea (QWidget *inParent = 0, Qt::WindowFlags inFlags = 0)
+          : QFrame (inParent, inFlags)
+          {}
+        ~RenderArea() = default;
+
+        RenderArea( const RenderArea& ) = default;
+        RenderArea( RenderArea&& ) = default;
+        RenderArea& operator =( const RenderArea& ) = default;
+        RenderArea& operator =( RenderArea&& ) = default;
+
+        void SetGeneratedPolyline (const QVector <qreal>& polyline);
+        void SetSimplifiedPolyline (const QVector <qreal>& polyline);
         void SetVisibleGeneratedPolyline (bool visible) { mDrawGeneratedPolyline = visible; }
         void SetVisibleSimplifiedPolyline (bool visible) { mDrawSimplifiedPolyline = visible; }
         void SetKeepAspectRatio (bool keep) { mKeepAspectRatio = keep; }
@@ -60,7 +69,7 @@ namespace psimpl {
         void paintEvent (QPaintEvent *inEvent);
 
     private:
-        QPainterPath Convert (QVector <qreal>& polyline);
+        QPainterPath Convert (const QVector <qreal>& polyline);
 
     private:
         QPainterPath mGeneratedPolyline;
