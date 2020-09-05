@@ -62,18 +62,24 @@ namespace psimpl {
 
     public:
         DPWorker (QObject* inParent = 0);
+        ~DPWorker () = default;
+
+        DPWorker( const DPWorker& ) = default;
+        DPWorker( DPWorker&& ) = default;
+        DPWorker& operator =( const DPWorker& ) = default;
+        DPWorker& operator =( DPWorker&& ) = default;
 
         void Generate (int inCount);
         void SimplifyNP (Container cont, int n);
-        void SimplifyRD (Container cont, QString tol);
-        void SimplifyPD (Container cont, QString tol, int repeat);
-        void SimplifyRW (Container cont, QString tol);
-        void SimplifyOp (Container cont, QString minTol, QString maxTol);
-        void SimplifyLa (Container cont, QString tol, int size);
-        void SimplifyDP_classic (Container cont, QString tol);
-        void SimplifyDP (Container cont, QString tol);
+        void SimplifyRD (Container cont, const QString& tol);
+        void SimplifyPD (Container cont, const QString& tol, int repeat);
+        void SimplifyRW (Container cont, const QString& tol);
+        void SimplifyOp (Container cont, const QString& minTol, const QString& maxTol);
+        void SimplifyLa (Container cont, const QString& tol, int size);
+        void SimplifyDP_classic (Container cont, const QString& tol);
+        void SimplifyDP (Container cont, const QString& tol);
         void SimplifyDP_N (Container cont, int count);
-        void SimplifyDP_reference (QString tol);
+        void SimplifyDP_reference (const QString& tol);
 
         int GetGeneratedPointCount () { return mGeneratedCoords.size () / 2; }
         int GetSimplifiedGeneratedPointCount () { return mSimplifiedCoords.size () / 2; }
@@ -87,9 +93,9 @@ namespace psimpl {
         void SignalSimplifyingPolyline ();
         void SignalCleaningConvertedPolyline ();
         
-        void SignalGeneratedPolyline (int duration, QVector <qreal>& polyline);
-        void SignalSimplifiedPolyline (int duration, QVector <qreal>& polyline);
-        void SignalSimplifiedPolyline (int duration, QVector <qreal>& polyline, double max, double sum, double mean, double std);
+        void SignalGeneratedPolyline (int duration, const QVector <qreal>& polyline);
+        void SignalSimplifiedPolyline (int duration, const QVector <qreal>& polyline);
+        void SignalSimplifiedPolyline (int duration, const QVector <qreal>& polyline, double max, double sum, double mean, double std);
 
     public:
         QVector <qreal> mGeneratedCoords;

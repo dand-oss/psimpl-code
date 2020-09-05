@@ -75,6 +75,11 @@ namespace psimpl {
         MainWindow (QWidget *parent = 0);
         ~MainWindow ();
 
+        MainWindow( const MainWindow& ) = default;
+        MainWindow( MainWindow&& ) = default;
+        MainWindow& operator =( const MainWindow& ) = default;
+        MainWindow& operator =( MainWindow&& ) = default;
+
     protected:
         void changeEvent (QEvent *e);
 
@@ -100,9 +105,9 @@ private slots:
     void SlotConvertingPolyline ();
     void SlotSimplifyingPolyline ();
     void SlotCleaningConvertedPolyline ();
-    void SlotGeneratedPolyline (int duration, QVector <qreal>& polyline);
-    void SlotSimplifiedPolyline (int duration, QVector <qreal>& polyline);
-    void SlotSimplifiedPolyline (int duration, QVector <qreal>& polyline, double max, double sum, double mean, double std);
+    void SlotGeneratedPolyline (int duration, const QVector <qreal>& polyline);
+    void SlotSimplifiedPolyline (int duration, const QVector <qreal>& polyline);
+    void SlotSimplifiedPolyline (int duration, const QVector <qreal>& polyline, double max, double sum, double mean, double std);
 };
 
 } // namespace psimpl

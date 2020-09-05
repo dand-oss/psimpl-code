@@ -165,7 +165,7 @@ namespace psimpl {
         DoSignalSimplifiedPolyline (duration);
     }
 
-    void DPWorker::SimplifyRD (Container cont, QString tol) {
+    void DPWorker::SimplifyRD (Container cont, const QString& tol) {
         QTime t;
         int duration = 0;
 
@@ -246,7 +246,7 @@ namespace psimpl {
         DoSignalSimplifiedPolyline (duration);
     }
 
-    void DPWorker::SimplifyPD (Container cont, QString tol, int repeat) {
+    void DPWorker::SimplifyPD (Container cont, const QString& tol, int repeat) {
         QTime t;
         int duration = 0;
 
@@ -327,7 +327,7 @@ namespace psimpl {
         DoSignalSimplifiedPolyline (duration);
     }
 
-    void DPWorker::SimplifyRW (Container cont, QString tol)
+    void DPWorker::SimplifyRW (Container cont, const QString& tol)
     {
         QTime t;
         int duration = 0;
@@ -409,7 +409,7 @@ namespace psimpl {
         DoSignalSimplifiedPolyline (duration);
     }
 
-    void DPWorker::SimplifyOp (Container cont, QString minTol, QString maxTol) {
+    void DPWorker::SimplifyOp (Container cont, const QString& minTol, const QString& maxTol) {
         QTime t;
         int duration = 0;
 
@@ -490,7 +490,7 @@ namespace psimpl {
         DoSignalSimplifiedPolyline (duration);
     }
 
-    void DPWorker::SimplifyLa (Container cont, QString tol, int size) {
+    void DPWorker::SimplifyLa (Container cont, const QString& tol, int size) {
         QTime t;
         int duration = 0;
 
@@ -571,7 +571,7 @@ namespace psimpl {
         DoSignalSimplifiedPolyline (duration);
     }
 
-    void DPWorker::SimplifyDP_classic (Container cont, QString tol) {
+    void DPWorker::SimplifyDP_classic (Container cont, const QString& tol) {
         QTime t;
         int duration = 0;
 
@@ -652,7 +652,7 @@ namespace psimpl {
         DoSignalSimplifiedPolyline (duration);
     }
 
-    void DPWorker::SimplifyDP (Container cont, QString tol) {
+    void DPWorker::SimplifyDP (Container cont, const QString& tol) {
         QTime t;
         int duration = 0;
 
@@ -814,7 +814,7 @@ namespace psimpl {
         DoSignalSimplifiedPolyline (duration);
     }
 
-    void DPWorker::SimplifyDP_reference (QString tol) {
+    void DPWorker::SimplifyDP_reference (const QString& tol) {
         mSimplifiedCoords.clear();
         // convert generated polyline to Point array
         emit SignalConvertingPolyline ();

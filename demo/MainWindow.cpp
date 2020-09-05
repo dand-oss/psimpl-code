@@ -95,16 +95,16 @@ namespace psimpl {
         if ( !rc ) throw std::runtime_error("could not connect");
         rc = connect(
             mWorker.get(),
-            qOverload<int, QVector <qreal>&>(&DPWorker::SignalSimplifiedPolyline),
+            qOverload<int, const QVector <qreal>&>(&DPWorker::SignalSimplifiedPolyline),
             this,
-            qOverload<int, QVector <qreal>&>(&MainWindow::SlotSimplifiedPolyline));
+            qOverload<int, const QVector <qreal>&>(&MainWindow::SlotSimplifiedPolyline));
         if ( !rc ) throw std::runtime_error("could not connect");
         rc = connect(
             mWorker.get(),
-            qOverload<int, QVector <qreal>&, double, double, double, double>(
+            qOverload<int, const QVector <qreal>&, double, double, double, double>(
                 &DPWorker::SignalSimplifiedPolyline),
             this,
-            qOverload<int, QVector <qreal>&, double, double, double, double>(
+            qOverload<int, const QVector <qreal>&, double, double, double, double>(
                 &MainWindow::SlotSimplifiedPolyline));
         if ( !rc ) throw std::runtime_error("could not connect");
     }
@@ -365,7 +365,7 @@ namespace psimpl {
         ui->statusBar->showMessage ("Deleting converted polyline...");
     }
 
-    void MainWindow::SlotGeneratedPolyline (int duration, QVector <qreal>& polyline)
+    void MainWindow::SlotGeneratedPolyline (int duration, const QVector <qreal>& polyline)
     {
         ui->statusBar->showMessage (QString ("Generation took %1 ms").arg (duration));
         ui->renderArea->SetGeneratedPolyline (polyline);
@@ -375,7 +375,7 @@ namespace psimpl {
         update();
     }
 
-    void MainWindow::SlotSimplifiedPolyline (int duration, QVector <qreal>& polyline)
+    void MainWindow::SlotSimplifiedPolyline (int duration, const QVector <qreal>& polyline)
     {
         const auto pointCount = polyline.count () / 2;
         ui->maxValueLabel->setText ("-");
@@ -393,7 +393,7 @@ namespace psimpl {
         update();
     }
 
-    void MainWindow::SlotSimplifiedPolyline (int duration, QVector <qreal>& polyline, double max, double sum, double mean, double std)
+    void MainWindow::SlotSimplifiedPolyline (int duration, const QVector <qreal>& polyline, double max, double sum, double mean, double std)
     {
         const auto pointCount = polyline.count () / 2;
         ui->maxValueLabel->setText (QString::number (max));
