@@ -117,11 +117,11 @@ namespace psimpl {
         //===================================================================
 
         // dot product (3D) which allows vector operations in arguments
-        #define __dot(u,v)   ((u).x * (v).x + (u).y * (v).y)
-        #define __norm2(v)   __dot(v,v)        // norm2 = squared length of vector
-        #define __norm(v)    sqrt(__norm2(v))  // norm = length of vector
-        #define __d2(u,v)    __norm2(u-v)      // distance squared = norm2 of difference
-        #define __d(u,v)     __norm(u-v)       // distance = norm of difference
+        #define __pdot(u,v)   ((u).x * (v).x + (u).y * (v).y)
+        #define __pnorm2(v)   __pdot(v,v)        // norm2 = squared length of vector
+        #define __pnorm(v)    sqrt(__norm2(v))   // norm = length of vector
+        #define __pdist2(u,v) __pnorm2(u-v)      // distance squared = norm2 of difference
+        #define __pdist(u,v)  __pnorm(u-v)       // distance = norm of difference
 
         // simplifyDP():
         //  This is the Douglas-Peucker recursive simplification routine
@@ -144,7 +144,7 @@ namespace psimpl {
             double   tol2 = tol * tol; // tolerance squared
             Segment S (v[j], v[k]);  // segment from v[j] to v[k]
             Vector  u = S.P1 - S.P0;   // segment direction vector
-            double  cu = __dot(u,u);     // segment length squared
+            double  cu = __pdot(u,u);     // segment length squared
 
             // test each vertex v[i] for max distance from S
             // compute using the Feb 2001 Algorithm's dist_Point_to_Segment()
@@ -157,15 +157,15 @@ namespace psimpl {
             {
                 // compute distance squared
                 w = v[i] - S.P0;
-                cw = __dot(w,u);
+                cw = __pdot(w,u);
                 if ( cw <= 0 )
-                    dv2 = __d2(v[i], S.P0);
+                    dv2 = __pdist2(v[i], S.P0);
                 else if ( cu <= cw )
-                    dv2 = __d2(v[i], S.P1);
+                    dv2 = __pdist2(v[i], S.P1);
                 else {
                     b = cw / cu;
                     Pb = S.P0 + b * u;
-                    dv2 = __d2(v[i], Pb);
+                    dv2 = __pdist2(v[i], Pb);
                 }
                 // test with current max distance squared
                 if (dv2 <= maxd2)
@@ -206,7 +206,7 @@ namespace psimpl {
             // STAGE 1.  Vertex Reduction within tolerance of prior vertex cluster
             vt[0] = V[0];              // start at the beginning
             for (i=k=1, pv=0; i<n; i++) {
-                if (__d2(V[i], V[pv]) < tol2) {
+                if (__pdist2(V[i], V[pv]) < tol2) {
                     continue;
                 }
                 vt[k++] = V[i];
