@@ -103,9 +103,9 @@ namespace psimpl {
     // ---------------------------------------------------------------------------------------------
 
     void TestUtil::TestCopyKey () {
-        float vec [10] = { 0.f, 1.f, 2.f, 3.f, 4.f, 5.f, 6.f, 7.f, 8.f, 9.f };
+        const float vec [10] = { 0.f, 1.f, 2.f, 3.f, 4.f, 5.f, 6.f, 7.f, 8.f, 9.f };
         float res [5];
-        float* it = res;
+        auto* it = res;
         psimpl::util::copy_key <5> (vec, it);
         ASSERT_TRUE(5 == std::distance (res, it));
         VERIFY_TRUE(res [0] == vec [0]);
@@ -118,10 +118,11 @@ namespace psimpl {
     // ---------------------------------------------------------------------------------------------
 
     void TestUtil::TestCopyKeys () {
-        short coords [10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+        const short coords [10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
         std::vector <bool> keys (5, false);
         std::deque <short> res;
-        psimpl::util::copy_keys <2> (coords, coords + 8, keys.begin (), std::back_inserter (res));
+        auto&& BSr = std::back_inserter (res);
+        psimpl::util::copy_keys <2> (coords, coords + 8, keys.begin (), BSr);
         VERIFY_TRUE(res.empty ());
 
         keys.clear ();
@@ -129,7 +130,7 @@ namespace psimpl {
         keys.push_back (false);
         keys.push_back (true);
         keys.push_back (true);
-        psimpl::util::copy_keys <2> (coords, coords + 8, keys.begin (), std::back_inserter (res));
+        psimpl::util::copy_keys <2> (coords, coords + 8, keys.begin (), BSr);
         VERIFY_TRUE(3 * 2 == res.size ());
         VERIFY_TRUE(0 == res [0]);
         VERIFY_TRUE(1 == res [1]);
