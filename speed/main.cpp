@@ -49,8 +49,8 @@
 #include <QTextStream>
 
 
-typedef QPair <QString, QStringList> Setting;
-typedef QVector <Setting> Settings;
+using Setting = QPair <QString, QStringList>;
+using Settings = QVector <Setting> ;
 
 
 const unsigned DIM = 2;
@@ -69,13 +69,17 @@ public:
     }
 
     ~BenchmarkController () {
-        unsigned index = repeat / 2;
+        const auto index = repeat / 2;
         qSort (mMeasurements);
         mResult = mMeasurements [index];
     }
+    BenchmarkController(const BenchmarkController&) = default;
+    BenchmarkController& operator = (const BenchmarkController&) = default;
+    BenchmarkController(BenchmarkController&&) = default;
+    BenchmarkController& operator = (BenchmarkController&&) = default;
 
     void StartMeasurement () {
-        unsigned measurement = getticks () - mTicks;
+        const auto measurement = static_cast<unsigned>(getticks ()) - mTicks;
         mMeasurements.push_back (measurement);
         --mRepeat;
         mTicks = getticks ();
@@ -89,7 +93,7 @@ private:
     unsigned& mResult;
     unsigned mRepeat;
     CycleCounterTicks mTicks;
-   QVector <unsigned> mMeasurements;
+    QVector <unsigned> mMeasurements;
 };
 
 #define BENCHMARK(elapsed) for (BenchmarkController ctrl (elapsed); !ctrl.IsDone (); ctrl.StartMeasurement ())
@@ -97,14 +101,18 @@ private:
 // -----------------------------------------------------------------------------
 
 template <class Iterator>
-void Benchmark_Ran (const std::string& container, Iterator first, Iterator last, const Settings& settings)
+void Benchmark_Ran (
+    const std::string& container,
+    const Iterator& first,
+    const Iterator& last,
+    const Settings& settings)
 {
     // benchmark all algorithms that support at least random iterators
-    int polylineSize = std::distance (first, last);
+    const auto polylineSize = std::distance (first, last);
     unsigned newElapsed = 0;
     unsigned oldElapsed = 0;
 
-    foreach (const Setting& setting, settings)
+    for (const Setting& setting : settings)
     {
         psimpl::util::scoped_array <double> newSimplification (polylineSize);
         psimpl::error::statistics newStats;
@@ -207,7 +215,8 @@ void Benchmark_Ran (const std::string& container, Iterator first, Iterator last,
         newStats = psimpl::compute_positional_error_statistics <DIM> (first, last, newSimplification.get (), newSimplification.get () + newSimplificationSize);
         oldStats = psimpl::compute_positional_error_statistics <DIM> (first, last, oldSimplification.get (), oldSimplification.get () + oldSimplificationSize);
 
-        std::cout << container << "," << setting.first.toStdString () << ",";
+        std::cout << container << ",";
+        QTextStream(stdout) << setting.first << ",";
         std::cout << newSimplificationSize / DIM << "," << (int) (((float) newSimplificationSize / (float) polylineSize) * 100.f) << "%,";
         std::cout << newElapsed << "," << newStats.mean << "," << newStats.std << "," << newStats.max << "," << newStats.sum << ",";
         if (oldElapsed) {
@@ -221,14 +230,18 @@ void Benchmark_Ran (const std::string& container, Iterator first, Iterator last,
 // -----------------------------------------------------------------------------
 
 template <class Iterator>
-void Benchmark_Bid (const std::string& container, Iterator first, Iterator last, const Settings& settings)
+void Benchmark_Bid (
+    const std::string& container,
+    const Iterator& first,
+    const Iterator& last,
+    const Settings& settings)
 {
     // benchmark all algorithms that support at least bidirectional iterators
-    int polylineSize = std::distance (first, last);
+    const auto polylineSize = std::distance (first, last);
     unsigned newElapsed = 0;
     unsigned oldElapsed = 0;
 
-    foreach (const Setting& setting, settings)
+    for (const Setting& setting : settings)
     {
         psimpl::util::scoped_array <double> newSimplification (polylineSize);
         psimpl::error::statistics newStats;
@@ -315,7 +328,8 @@ void Benchmark_Bid (const std::string& container, Iterator first, Iterator last,
         newStats = psimpl::compute_positional_error_statistics <DIM> (first, last, newSimplification.get (), newSimplification.get () + newSimplificationSize);
         oldStats = psimpl::compute_positional_error_statistics <DIM> (first, last, oldSimplification.get (), oldSimplification.get () + oldSimplificationSize);
 
-        std::cout << container << "," << setting.first.toStdString () << ",";
+        std::cout << container << ",";
+        QTextStream(stdout) << setting.first << ",";
         std::cout << newSimplificationSize / DIM << "," << (int) (((float) newSimplificationSize / (float) polylineSize) * 100.f) << "%,";
         std::cout << newElapsed << "," << newStats.mean << "," << newStats.std << "," << newStats.max << "," << newStats.sum << ",";
         std::cout << oldElapsed << "," << oldStats.mean << "," << oldStats.std << "," << oldStats.max << "," << oldStats.sum << ",";
@@ -326,15 +340,19 @@ void Benchmark_Bid (const std::string& container, Iterator first, Iterator last,
 // -----------------------------------------------------------------------------
 
 template <class Iterator>
-void Benchmark_Ref (const std::string& container, Iterator first, Iterator last, const Settings& settings)
+void Benchmark_Ref (
+    const std::string& container,
+    const Iterator& first,
+    const Iterator& last,
+    const Settings& settings)
 {
     // benchmark all reference algorithms
-    int polylineSize = std::distance (first, last);
-    int pointCount = polylineSize / DIM;
+    const auto polylineSize = std::distance (first, last);
+    const auto pointCount = polylineSize / DIM;
     int simplificationPointCount = 0;
     unsigned elapsed = 0;
 
-    foreach (const Setting& setting, settings)
+    for (const Setting& setting : settings)
     {
         if (setting.first != "simplify_douglas_peucker_reference") {
             continue;
@@ -356,7 +374,11 @@ void Benchmark_Ref (const std::string& container, Iterator first, Iterator last,
 
         BENCHMARK(elapsed) {
             simplificationPointCount =
-                psimpl::reference::poly_simplify (setting.second [0].toDouble (), polylinePoints.get (), pointCount, simplifiedPoints.get ());
+                psimpl::reference::poly_simplify (
+                        setting.second [0].toDouble (),
+                        polylinePoints.get (),
+                        pointCount,
+                        simplifiedPoints.get ());
         }
 
         // convert simplification points to soords
@@ -366,9 +388,14 @@ void Benchmark_Ref (const std::string& container, Iterator first, Iterator last,
             simplification [j*2+1] = simplifiedPoints [j].y;
         }
 
-        newStats = psimpl::compute_positional_error_statistics <DIM> (first, last, simplification.get (), simplification.get () + simplificationSize);
+        newStats = psimpl::compute_positional_error_statistics <DIM> (
+                first,
+                last,
+                simplification.get (),
+                simplification.get () + simplificationSize);
 
-        std::cout << container << "," << setting.first.toStdString () << ",";
+        std::cout << container << ",";
+        QTextStream(stdout) << setting.first << ",";
         std::cout << simplificationPointCount << "," << (int) (((float) simplificationPointCount / (float) pointCount) * 100.f) << "%," << elapsed << ",";
         std::cout << newStats.mean << "," << newStats.std << "," << newStats.max << "," << newStats.sum << std::endl;
     }
@@ -384,7 +411,7 @@ void Benchmark_Ref (const std::string& container, Iterator first, Iterator last,
 //////    int pointCount = polylineSize / DIM;
 //////    unsigned elapsed = 0;
 //////
-//////    foreach (const Setting& setting, settings)
+//////    for (const Setting& setting : settings)
 //////    {
 //////        if (setting.first != "simplify_douglas_peucker_boost") {
 //////            continue;
@@ -409,7 +436,9 @@ void Benchmark_Ref (const std::string& container, Iterator first, Iterator last,
 
 // -----------------------------------------------------------------------------
 
-void Benchmark (const QString& polylinePath, const QString& settingsPath)
+void Benchmark (
+    const QString& polylinePath,
+    const QString& settingsPath)
 {
     QVector <double> polyline;
     Settings settings;
@@ -418,15 +447,15 @@ void Benchmark (const QString& polylinePath, const QString& settingsPath)
     {
         QFile polylineFile (polylinePath);
         if (!polylineFile.open (QIODevice::ReadOnly | QIODevice::Text)) {
-            std::cout << "unable to read " << polylinePath.toStdString () << std::endl;
+            QTextStream(stderr) << "unable to read " << polylinePath << endl;
             return;
         }
         QTextStream in (&polylineFile);
         while (!in.atEnd ()) {
-            QString line = in.readLine ();
-            QStringList list = line.split (',', QString::SkipEmptyParts);
+            const auto& line = in.readLine ();
+            const auto& list = line.split (',', QString::SkipEmptyParts);
             if (list.size () < 2) {
-                std::cout << "invalid line read from " << polylinePath.toStdString () << std::endl;
+                QTextStream(stderr) << "invalid line read from " << polylinePath << endl;
                 return;
             }
             polyline.push_back (list [0].toDouble ());
@@ -438,16 +467,16 @@ void Benchmark (const QString& polylinePath, const QString& settingsPath)
     {
         QFile settingsFile (settingsPath);
         if (!settingsFile.open (QIODevice::ReadOnly | QIODevice::Text)) {
-            std::cout << "unable to read " << settingsPath.toStdString () << std::endl;
+            QTextStream(stderr) << "unable to read " << settingsPath << endl;
             return;
         }
         QTextStream in (&settingsFile);
         while (!in.atEnd ()) {
-            QString line = in.readLine ();
-            QString algo = line.section (',', 0, 0);
-            QStringList params = line.section (',', 1).split (',', QString::SkipEmptyParts);
+            const auto& line = in.readLine ();
+            const auto& algo = line.section (',', 0, 0);
+            const auto& params = line.section (',', 1).split (',', QString::SkipEmptyParts);
             if (0 == algo.size () || 0 == params.size ()) {
-                std::cout << "invalid line read from " << settingsPath.toStdString () << std::endl;
+                QTextStream(stderr) << "invalid line read from " << settingsPath << endl;
                 return;
             }
             settings.push_back (qMakePair (algo, params));
@@ -464,7 +493,7 @@ void Benchmark (const QString& polylinePath, const QString& settingsPath)
     std::cout << "cont,algo,size,ratio,ticks,error mean,error std,error max,error sum,ticks,error mean,error std,error max,error sum,diff" << std::endl;
     // test with double[]
     {
-        const double* poly = polyline.constData ();
+        const auto poly = polyline.constData ();
         Benchmark_Ran ("double []", poly, poly + polyline.size (), settings);
     }
     // test with std::vector <double>
@@ -484,7 +513,7 @@ void Benchmark (const QString& polylinePath, const QString& settingsPath)
     }
     // test with reference::Point[]
     {
-        const double* poly = polyline.constData ();
+        const auto* poly = polyline.constData ();
         Benchmark_Ref ("reference::Point[]", poly, poly + polyline.size (), settings);
     }
     //////// test with boost
@@ -506,17 +535,29 @@ int main (int argc, char* argv [])
     }
 
     QDirIterator it (".", QStringList () << "*.algo", QDir::Files | QDir::Readable);
+    std::cout << "Processing *.algo files" << std::endl;
+    int num_processed = 0;
     while (it.hasNext ()) {
+        num_processed++;
         it.next ();
-        QFileInfo settings = it.fileInfo ();
+        const auto& settings = it.fileInfo ();
         QFileInfo polyline (settings.dir (), settings.completeBaseName ().append (".poly"));
         if (polyline.exists () && polyline.isFile () && polyline.isReadable ()) {
             std::cout << "================================================================================" << std::endl;
-            std::cout << "benchmarking : " << settings.completeBaseName ().toStdString ();
+            QTextStream(stdout) << num_processed << " benchmarking : " << settings.canonicalFilePath() ;
             Benchmark (polyline.absoluteFilePath (), settings.absoluteFilePath ());
         }
+        else {
+            QTextStream(stderr) << num_processed << " FAILED " << polyline.canonicalFilePath() << endl;
+            QTextStream(stderr) << " specified in " << settings.canonicalFilePath() << endl;
+        }
     }
-    std::cout << "================================================================================" << std::endl;
+    if (!num_processed) {
+        std::cout << "WARNING - no *.algo files to process" << std::endl;
+    }
+
+    std::cout << "Completed" << std::endl
+    << "================================================================================" << std::endl;
 
     return 0;
 }
