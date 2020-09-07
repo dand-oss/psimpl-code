@@ -21,7 +21,7 @@ target_link_libraries(${exename} PUBLIC
 # Source files
 target_sources(${exename} PRIVATE
     main.cpp
-    cycle_p.h
+    clocktic.h
 )
 
 # Installation
