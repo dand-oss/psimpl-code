@@ -35,7 +35,7 @@
 // cheat!
 #include "../demo/psimpl_reference.h"
 #include "prev/psimpl.h"
-#include "cycle_p.h"
+#include "clocktic.h"
 
 #include <iostream>
 #include <vector>
@@ -65,7 +65,7 @@ public:
         mResult (result),
         mRepeat (repeat)
     {
-        mTicks = getticks ();
+        mTicks = clock_tics ();
     }
 
     ~BenchmarkController () {
@@ -79,10 +79,10 @@ public:
     BenchmarkController& operator = (BenchmarkController&&) = default;
 
     void StartMeasurement () {
-        const auto measurement = static_cast<unsigned>(getticks ()) - mTicks;
+        const auto measurement = clock_tics () - mTicks;
         mMeasurements.push_back (measurement);
         --mRepeat;
-        mTicks = getticks ();
+        mTicks = clock_tics ();
     }
 
     bool IsDone () {
@@ -92,7 +92,7 @@ public:
 private:
     unsigned& mResult;
     unsigned mRepeat;
-    CycleCounterTicks mTicks;
+    unsigned long mTicks;
     QVector <unsigned> mMeasurements;
 };
 
@@ -367,7 +367,7 @@ void Benchmark_Ref (
 
         // convert polyline coords to points
         Iterator curr = first;
-        for (int i=0; i<pointCount; i++) {
+        for (size_t i=0; i<pointCount; i++) {
             polylinePoints [i].x = *curr++;
             polylinePoints [i].y = *curr++;
         }
