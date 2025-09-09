@@ -861,3 +861,5 @@ namespace psimpl {
         }
     }
 } // namespace psimpl
+
+#include "moc_DPWorker.cpp"

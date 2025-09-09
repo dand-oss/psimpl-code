@@ -411,3 +411,5 @@ namespace psimpl {
         update();
     }
 } // namespace psimpl
+
+#include "moc_MainWindow.cpp"
