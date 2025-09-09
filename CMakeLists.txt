@@ -9,6 +9,13 @@ project(
 
 set(libname "psimpl")
 
+###############
+# ASI default settings
+list(APPEND CMAKE_MODULE_PATH "$ENV{ASV_CMAKE}")
+include(asv_cmake_defaults)
+asv_cmake_defaults( )
+###############
+
 # Options for building demo programs
 option(PSIMPL_BUILD_DEMO "Build the psimpl GUI demo application" OFF)
 option(PSIMPL_BUILD_TEST "Build the psimpl test suite" ON)
