@@ -5,8 +5,13 @@ project(psimpl-speed  CXX)
 set(exename "psimpl-speed")
 
 find_package(Qt6 CONFIG REQUIRED
+    PATHS ${AQTDIR} NO_DEFAULT_PATH
     COMPONENTS
     Core
+)
+
+asv_print_package_properties(
+    Qt::Core
 )
 
 # Define the executable
