@@ -5,9 +5,15 @@ project(psimpl-demo  CXX)
 set(exename "psimpl-demo")
 
 find_package(Qt6 CONFIG REQUIRED
+    PATHS ${AQTDIR} NO_DEFAULT_PATH
     COMPONENTS
     Gui
     Widgets
+)
+
+print_target_properties(
+    Qt::Gui
+    Qt::Widgets
 )
 
 # Generate headers to binary dir from ui files
