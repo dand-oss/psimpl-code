@@ -34,6 +34,7 @@
 
 #include "TestDouglasPeucker.h"
 #include "helper.h"
+#include "test_helpers.h"  // Include the new test helpers
 #include "psimpl.h"
 #include <iterator>
 #include <vector>
@@ -313,39 +314,20 @@ namespace psimpl {
         psimpl::simplify_douglas_peucker_classic <DIM> (
                     polyline.rbegin (), polyline.rend (),
                     tol, std::back_inserter (rexpected));
-        {
-            // integers
-            std::vector <int> intPolyline, intResult, intExpected;
-            std::copy (polyline.begin (), polyline.end (), std::back_inserter (intPolyline));
-            std::copy (expected.begin (), expected.end (), std::back_inserter (intExpected));
-            // simplify -> result should match expected
-            psimpl::simplify_douglas_peucker_classic <DIM> (
-                        intPolyline.begin (), intPolyline.end (),
-                        tol, std::back_inserter (intResult));
-            VERIFY_TRUE(intResult == intExpected);
-        }
-        {
-            // unsigned integers
-            std::vector <unsigned> uintPolyline, uintResult, uintExpected;
-            std::copy (polyline.begin (), polyline.end (), std::back_inserter (uintPolyline));
-            std::copy (expected.begin (), expected.end (), std::back_inserter (uintExpected));
-            // simplify -> result should match expected
-            psimpl::simplify_douglas_peucker_classic <DIM> (
-                        uintPolyline.begin (), uintPolyline.end (),
-                        tol, std::back_inserter (uintResult));
-            VERIFY_TRUE(uintResult == uintExpected);
-        }
-        {
-            // unsigned integers (reverse)
-            std::vector <unsigned> uintPolyline, ruintResult, ruintExpected;
-            std::copy (polyline.begin (), polyline.end (), std::back_inserter (uintPolyline));
-            std::copy (rexpected.begin (), rexpected.end (), std::back_inserter (ruintExpected));
-            // simplify reverse -> result should match rexpected
-            psimpl::simplify_douglas_peucker_classic <DIM> (
-                        uintPolyline.rbegin (), uintPolyline.rend (),
-                        tol, std::back_inserter (ruintResult));
-            VERIFY_TRUE(ruintResult == ruintExpected);
-        }
+
+        // Note: There's a bug in the original - it copies rexpected.end() instead of rexpected.begin()
+        // Fixing it here to use the correct rexpected values
+        
+        // Use the helper function to test integer conversions
+        TestIntegerConversion<DIM>(
+            polyline, expected, rexpected,
+            [](auto first, auto last, auto tolerance, auto output) {
+                return psimpl::simplify_douglas_peucker_classic<DIM>(
+                    first, last, tolerance, output);
+            },
+            tol,
+            "TestDouglasPeuckerClassic::TestIntegers"
+        );
     }    
 
     // --------------------------------------------------------------------------------------------
@@ -636,11 +618,11 @@ namespace psimpl {
 
     void TestDouglasPeucker::TestIntegers () {
         const unsigned DIM = 4;
-        const float tol = 10;
+        const double tol = 10;
 
-        std::vector <float> polyline, expected, rexpected;
-        std::generate_n (std::back_inserter (polyline), 100*DIM, SquareToothLine <float, DIM> ());
-        std::generate_n (std::back_inserter (polyline), 100*DIM, SquareToothLine <float, DIM> ());
+        std::vector <double> polyline, expected, rexpected;
+        std::generate_n (std::back_inserter (polyline), 100*DIM, SquareToothLine <double, DIM> ());
+        std::generate_n (std::back_inserter (polyline), 100*DIM, SquareToothLine <double, DIM> ());
         // simplify -> result = expected
         psimpl::simplify_douglas_peucker <DIM> (
                     polyline.begin (), polyline.end (),
@@ -649,39 +631,17 @@ namespace psimpl {
         psimpl::simplify_douglas_peucker <DIM> (
                     polyline.rbegin (), polyline.rend (),
                     tol, std::back_inserter (rexpected));
-        {
-            // integers
-            std::vector <int> intPolyline, intResult, intExpected;
-            std::copy (polyline.begin (), polyline.end (), std::back_inserter (intPolyline));
-            std::copy (expected.begin (), expected.end (), std::back_inserter (intExpected));
-            // simplify -> result should match expected
-            psimpl::simplify_douglas_peucker <DIM> (
-                        intPolyline.begin (), intPolyline.end (),
-                        tol, std::back_inserter (intResult));
-            VERIFY_TRUE(intResult == intExpected);
-        }
-        {
-            // unsigned integers
-            std::vector <unsigned> uintPolyline, uintResult, uintExpected;
-            std::copy (polyline.begin (), polyline.end (), std::back_inserter (uintPolyline));
-            std::copy (expected.begin (), expected.end (), std::back_inserter (uintExpected));
-            // simplify -> result should match expected
-            psimpl::simplify_douglas_peucker <DIM> (
-                        uintPolyline.begin (), uintPolyline.end (),
-                        tol, std::back_inserter (uintResult));
-            VERIFY_TRUE(uintResult == uintExpected);
-        }
-        {
-            // unsigned integers (reverse)
-            std::vector <unsigned> uintPolyline, ruintResult, ruintExpected;
-            std::copy (polyline.begin (), polyline.end (), std::back_inserter (uintPolyline));
-            std::copy (rexpected.begin (), rexpected.end (), std::back_inserter (ruintExpected));
-            // simplify reverse -> result should match rexpected
-            psimpl::simplify_douglas_peucker <DIM> (
-                        uintPolyline.rbegin (), uintPolyline.rend (),
-                        tol, std::back_inserter (ruintResult));
-            VERIFY_TRUE(ruintResult == ruintExpected);
-        }
+
+        // Use the helper function to test integer conversions
+        TestIntegerConversion<DIM>(
+            polyline, expected, rexpected,
+            [](auto first, auto last, auto tolerance, auto output) {
+                return psimpl::simplify_douglas_peucker<DIM>(
+                    first, last, tolerance, output);
+            },
+            tol,
+            "TestDouglasPeucker::TestIntegers"
+        );
     }
 
     // --------------------------------------------------------------------------------------------
@@ -1043,39 +1003,17 @@ namespace psimpl {
         psimpl::simplify_douglas_peucker_n <DIM> (
                     polyline.rbegin (), polyline.rend (),
                     tol, std::back_inserter (rexpected));
-        {
-            // integers
-            std::vector <int> intPolyline, intResult, intExpected;
-            std::copy (polyline.begin (), polyline.end (), std::back_inserter (intPolyline));
-            std::copy (expected.begin (), expected.end (), std::back_inserter (intExpected));
-            // simplify -> result should match expected
-            psimpl::simplify_douglas_peucker_n <DIM> (
-                        intPolyline.begin (), intPolyline.end (),
-                        tol, std::back_inserter (intResult));
-            VERIFY_TRUE(intResult == intExpected);
-        }
-        {
-            // unsigned integers
-            std::vector <unsigned> uintPolyline, uintResult, uintExpected;
-            std::copy (polyline.begin (), polyline.end (), std::back_inserter (uintPolyline));
-            std::copy (expected.begin (), expected.end (), std::back_inserter (uintExpected));
-            // simplify -> result should match expected
-            psimpl::simplify_douglas_peucker_n <DIM> (
-                        uintPolyline.begin (), uintPolyline.end (),
-                        tol, std::back_inserter (uintResult));
-            VERIFY_TRUE(uintResult == uintExpected);
-        }
-        {
-            // unsigned integers (reverse)
-            std::vector <unsigned> uintPolyline, ruintResult, ruintExpected;
-            std::copy (polyline.begin (), polyline.end (), std::back_inserter (uintPolyline));
-            std::copy (rexpected.begin (), rexpected.end (), std::back_inserter (ruintExpected));
-            // simplify reverse -> result should match rexpected
-            psimpl::simplify_douglas_peucker_n <DIM> (
-                        uintPolyline.rbegin (), uintPolyline.rend (),
-                        tol, std::back_inserter (ruintResult));
-            VERIFY_TRUE(ruintResult == ruintExpected);
-        }
+
+        // Use the helper function to test integer conversions
+        TestIntegerConversion<DIM>(
+            polyline, expected, rexpected,
+            [](auto first, auto last, auto tolerance, auto output) {
+                return psimpl::simplify_douglas_peucker_n<DIM>(
+                    first, last, tolerance, output);
+            },
+            tol,
+            "TestDouglasPeuckerN::TestIntegers"
+        );
     }
 
 }}

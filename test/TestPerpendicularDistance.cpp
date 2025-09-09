@@ -34,6 +34,7 @@
 
 #include "TestPerpendicularDistance.h"
 #include "helper.h"
+#include "test_helpers.h"  // Include the new test helpers
 #include "psimpl.h"
 #include <iterator>
 #include <vector>
@@ -318,7 +319,7 @@ namespace psimpl {
         // invalid input
         VERIFY_TRUE(
             std::distance (
-                result, 
+                result,
                 psimpl::simplify_perpendicular_distance <DIM> (
                     polyline, polyline + count*DIM, 0.f,
                     result))
@@ -327,7 +328,7 @@ namespace psimpl {
         // valid input
         VERIFY_TRUE(
             std::distance (
-                result, 
+                result,
                 psimpl::simplify_perpendicular_distance <DIM> (
                     polyline, polyline + count*DIM, 10.f,
                     result))
@@ -349,39 +350,17 @@ namespace psimpl {
         psimpl::simplify_perpendicular_distance <DIM> (
                     polyline.rbegin (), polyline.rend (),
                     tol, std::back_inserter (rexpected));
-        {
-            // integers
-            std::vector <int> intPolyline, intResult, intExpected;
-            std::copy (polyline.begin (), polyline.end (), std::back_inserter (intPolyline));
-            std::copy (expected.begin (), expected.end (), std::back_inserter (intExpected));
-            // simplify -> result should match expected
-            psimpl::simplify_perpendicular_distance <DIM> (
-                        intPolyline.begin (), intPolyline.end (),
-                        tol, std::back_inserter (intResult));
-            VERIFY_TRUE(intResult == intExpected);
-        }
-        {
-            // unsigned integers
-            std::vector <unsigned> uintPolyline, uintResult, uintExpected;
-            std::copy (polyline.begin (), polyline.end (), std::back_inserter (uintPolyline));
-            std::copy (expected.begin (), expected.end (), std::back_inserter (uintExpected));
-            // simplify -> result should match expected
-            psimpl::simplify_perpendicular_distance <DIM> (
-                        uintPolyline.begin (), uintPolyline.end (),
-                        tol, std::back_inserter (uintResult));
-            VERIFY_TRUE(uintResult == uintExpected);
-        }
-        {
-            // unsigned integers (reverse)
-            std::vector <unsigned> uintPolyline, ruintResult, ruintExpected;
-            std::copy (polyline.begin (), polyline.end (), std::back_inserter (uintPolyline));
-            std::copy (rexpected.begin (), rexpected.end (), std::back_inserter (ruintExpected));
-            // simplify reverse -> result should match rexpected
-            psimpl::simplify_perpendicular_distance <DIM> (
-                        uintPolyline.rbegin (), uintPolyline.rend (),
-                        tol, std::back_inserter (ruintResult));
-            VERIFY_TRUE(ruintResult == ruintExpected);
-        }
+
+        // Use the helper function to test integer conversions
+        TestIntegerConversion<DIM>(
+            polyline, expected, rexpected,
+            [](auto first, auto last, auto tolerance, auto output) {
+                return psimpl::simplify_perpendicular_distance<DIM>(
+                    first, last, tolerance, output);
+            },
+            tol,
+            "TestIntegers_sp"
+        );
     }
 
     void TestPerpendicularDistance::TestIncompletePoint_mp () {
@@ -590,7 +569,7 @@ namespace psimpl {
             // invalid input
             VERIFY_TRUE(
                 std::distance (
-                    result, 
+                    result,
                     psimpl::simplify_perpendicular_distance <DIM> (
                         polyline, polyline + count*DIM, invalidTol, repeat,
                         result))
@@ -599,7 +578,7 @@ namespace psimpl {
             // valid input
             VERIFY_TRUE(
                 std::distance (
-                    result, 
+                    result,
                     psimpl::simplify_perpendicular_distance <DIM> (
                         polyline, polyline + count*DIM, validTol, repeat,
                         result))
@@ -610,7 +589,7 @@ namespace psimpl {
             // invalid input
             VERIFY_TRUE(
                 std::distance (
-                    result, 
+                    result,
                     psimpl::simplify_perpendicular_distance <DIM> (
                         polyline, polyline + count*DIM, invalidTol, repeat,
                         result))
@@ -619,7 +598,7 @@ namespace psimpl {
             // valid input
             VERIFY_TRUE(
                 std::distance (
-                    result, 
+                    result,
                     psimpl::simplify_perpendicular_distance <DIM> (
                         polyline, polyline + count*DIM, validTol, repeat,
                         result))
@@ -630,7 +609,7 @@ namespace psimpl {
             // invalid input
             VERIFY_TRUE(
                 std::distance (
-                    result, 
+                    result,
                     psimpl::simplify_perpendicular_distance <DIM> (
                         polyline, polyline + count*DIM, invalidTol, repeat,
                         result))
@@ -639,7 +618,7 @@ namespace psimpl {
             // valid input
             VERIFY_TRUE(
                 std::distance (
-                    result, 
+                    result,
                     psimpl::simplify_perpendicular_distance <DIM> (
                         polyline, polyline + count*DIM, validTol, repeat,
                         result))
@@ -650,7 +629,7 @@ namespace psimpl {
             // invalid input
             VERIFY_TRUE(
                 std::distance (
-                    result, 
+                    result,
                     psimpl::simplify_perpendicular_distance <DIM> (
                         polyline, polyline + count*DIM, invalidTol, repeat,
                         result))
@@ -659,7 +638,7 @@ namespace psimpl {
             // valid input
             VERIFY_TRUE(
                 std::distance (
-                    result, 
+                    result,
                     psimpl::simplify_perpendicular_distance <DIM> (
                         polyline, polyline + count*DIM, validTol, repeat,
                         result))
@@ -670,7 +649,7 @@ namespace psimpl {
     void TestPerpendicularDistance::TestIntegers_mp () {
         const unsigned DIM = 2;
         const double tol = 3;
-        const short repeat = 5;
+        const int repeat = 5;
 
         std::vector <float> polyline, expected, rexpected;
         std::generate_n (std::back_inserter (polyline), 100*DIM, SquareToothLine <float, DIM> ());
@@ -683,39 +662,18 @@ namespace psimpl {
         psimpl::simplify_perpendicular_distance <DIM> (
                     polyline.rbegin (), polyline.rend (),
                     tol, repeat, std::back_inserter (rexpected));
-        {
-            // integers
-            std::vector <int> intPolyline, intResult, intExpected;
-            std::copy (polyline.begin (), polyline.end (), std::back_inserter (intPolyline));
-            std::copy (expected.begin (), expected.end (), std::back_inserter (intExpected));
-            // simplify -> result should match expected
-            psimpl::simplify_perpendicular_distance <DIM> (
-                        intPolyline.begin (), intPolyline.end (),
-                        tol, repeat, std::back_inserter (intResult));
-            VERIFY_TRUE(intResult == intExpected);
-        }
-        {
-            // unsigned integers
-            std::vector <unsigned> uintPolyline, uintResult, uintExpected;
-            std::copy (polyline.begin (), polyline.end (), std::back_inserter (uintPolyline));
-            std::copy (expected.begin (), expected.end (), std::back_inserter (uintExpected));
-            // simplify -> result should match expected
-            psimpl::simplify_perpendicular_distance <DIM> (
-                        uintPolyline.begin (), uintPolyline.end (),
-                        tol, repeat, std::back_inserter (uintResult));
-            VERIFY_TRUE(uintResult == uintExpected);
-        }
-        {
-            // unsigned integers (reverse)
-            std::vector <unsigned> uintPolyline, ruintResult, ruintExpected;
-            std::copy (polyline.begin (), polyline.end (), std::back_inserter (uintPolyline));
-            std::copy (rexpected.begin (), rexpected.end (), std::back_inserter (ruintExpected));
-            // simplify reverse -> result should match rexpected
-            psimpl::simplify_perpendicular_distance <DIM> (
-                        uintPolyline.rbegin (), uintPolyline.rend (),
-                        tol, repeat, std::back_inserter (ruintResult));
-            VERIFY_TRUE(ruintResult == ruintExpected);
-        }
+
+        // Use the helper function to test integer conversions with repeat parameter
+        TestIntegerConversionWithRepeat<DIM>(
+            polyline, expected, rexpected,
+            [](auto first, auto last, auto tolerance, auto rep, auto output) {
+                return psimpl::simplify_perpendicular_distance<DIM>(
+                    first, last, tolerance, rep, output);
+            },
+            tol,
+            repeat,
+            "TestIntegers_mp"
+        );
     }
 
 }}

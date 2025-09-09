@@ -34,6 +34,7 @@
 
 #include "TestOpheim.h"
 #include "helper.h"
+#include "test_helpers.h"  // Include the new test helpers
 #include "psimpl.h"
 #include <iterator>
 #include <vector>
@@ -44,6 +45,20 @@
 namespace psimpl {
     namespace test
 {
+    namespace {
+        // Helper class to handle two tolerance parameters
+        template<unsigned DIM>
+        struct OpheimSimplifier {
+            double minTol;
+            double maxTol;
+
+            template<typename InputIt, typename OutputIt>
+            OutputIt operator()(InputIt first, InputIt last, OutputIt result) const {
+                return psimpl::simplify_opheim<DIM>(first, last, minTol, maxTol, result);
+            }
+        };
+    }
+
     TestOpheim::TestOpheim () {
         TEST_RUN("incomplete point", TestIncompletePoint ());
         TEST_RUN("not enough points", TestNotEnoughPoints ());
@@ -56,7 +71,7 @@ namespace psimpl {
         TEST_RUN("return value", TestReturnValue ());
         TEST_RUN("signed/unsigned integers", TestIntegers ());
     }
-    
+
     // incomplete point: coord count % DIM > 1
     void TestOpheim::TestIncompletePoint () {
         const unsigned DIM = 2;
@@ -84,7 +99,7 @@ namespace psimpl {
 
         VERIFY_FALSE(polyline == result);
     }
-    
+
     // not enough points: point count < 3
     void TestOpheim::TestNotEnoughPoints () {
         const unsigned DIM = 2;
@@ -122,7 +137,7 @@ namespace psimpl {
             std::back_inserter (result));
 
         VERIFY_TRUE(polyline == result);
-        
+
         // 3 points
         polyline.push_back(2.f);
         polyline.push_back(2.f);
@@ -134,7 +149,7 @@ namespace psimpl {
 
         VERIFY_TRUE(polyline != result);
     }
-    
+
     // invalid: tol == 0
     void TestOpheim::TestInvalidTol () {
         const unsigned DIM = 3;
@@ -417,7 +432,7 @@ namespace psimpl {
         // invalid input
         VERIFY_TRUE (
             std::distance (
-                result, 
+                result,
                 psimpl::simplify_opheim <DIM> (
                     polyline, polyline + count*DIM, 0.f, 0.f,
                     result))
@@ -426,7 +441,7 @@ namespace psimpl {
         // valid input
         VERIFY_TRUE (
             std::distance (
-                result, 
+                result,
                 psimpl::simplify_opheim <DIM> (
                     polyline, polyline + count*DIM, 1.f, 100.f,
                     result))
@@ -449,37 +464,43 @@ namespace psimpl {
         psimpl::simplify_opheim <DIM> (
                     polyline.rbegin (), polyline.rend (),
                     minTol, maxTol, std::back_inserter (rexpected));
+
+        // Test with int
         {
-            // integers
-            std::vector <int> intPolyline, intResult, intExpected;
-            std::copy (polyline.begin (), polyline.end (), std::back_inserter (intPolyline));
-            std::copy (expected.begin (), expected.end (), std::back_inserter (intExpected));
-            // simplify -> result should match expected
-            psimpl::simplify_opheim <DIM> (
-                        intPolyline.begin (), intPolyline.end (),
-                        minTol, maxTol, std::back_inserter (intResult));
+            auto intPolyline = ConvertVector<int>(polyline);
+            auto intExpected = ConvertVector<int>(expected);
+            std::vector<int> intResult;
+
+            OpheimSimplifier<DIM> simplifier{minTol, maxTol};
+            simplifier(intPolyline.begin(), intPolyline.end(),
+                      std::back_inserter(intResult));
+
             VERIFY_TRUE(intResult == intExpected);
         }
+
+        // Test with unsigned int
         {
-            // unsigned integers
-            std::vector <unsigned> uintPolyline, uintResult, uintExpected;
-            std::copy (polyline.begin (), polyline.end (), std::back_inserter (uintPolyline));
-            std::copy (expected.begin (), expected.end (), std::back_inserter (uintExpected));
-            // simplify -> result should match expected
-            psimpl::simplify_opheim <DIM> (
-                        uintPolyline.begin (), uintPolyline.end (),
-                        minTol, maxTol, std::back_inserter (uintResult));
+            auto uintPolyline = ConvertVector<unsigned>(polyline);
+            auto uintExpected = ConvertVector<unsigned>(expected);
+            std::vector<unsigned> uintResult;
+
+            OpheimSimplifier<DIM> simplifier{minTol, maxTol};
+            simplifier(uintPolyline.begin(), uintPolyline.end(),
+                      std::back_inserter(uintResult));
+
             VERIFY_TRUE(uintResult == uintExpected);
         }
+
+        // Test with unsigned int (reverse)
         {
-            // unsigned integers (reverse)
-            std::vector <unsigned> uintPolyline, ruintResult, ruintExpected;
-            std::copy (polyline.begin (), polyline.end (), std::back_inserter (uintPolyline));
-            std::copy (rexpected.begin (), rexpected.end (), std::back_inserter (ruintExpected));
-            // simplify reverse -> result should match rexpected
-            psimpl::simplify_opheim <DIM> (
-                        uintPolyline.rbegin (), uintPolyline.rend (),
-                        minTol, maxTol, std::back_inserter (ruintResult));
+            auto uintPolyline = ConvertVector<unsigned>(polyline);
+            auto ruintExpected = ConvertVector<unsigned>(rexpected);
+            std::vector<unsigned> ruintResult;
+
+            OpheimSimplifier<DIM> simplifier{minTol, maxTol};
+            simplifier(uintPolyline.rbegin(), uintPolyline.rend(),
+                      std::back_inserter(ruintResult));
+
             VERIFY_TRUE(ruintResult == ruintExpected);
         }
     }

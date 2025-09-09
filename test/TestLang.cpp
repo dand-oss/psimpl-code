@@ -34,6 +34,7 @@
 
 #include "TestLang.h"
 #include "helper.h"
+#include "test_helpers.h"  // Include the new test helpers
 #include "psimpl.h"
 #include <iterator>
 #include <vector>
@@ -135,7 +136,7 @@ namespace psimpl {
         std::vector <float> polyline;
         std::generate_n (std::back_inserter (polyline), count*DIM, StraightLine <float, DIM> ());
         std::vector <float> result;
-        
+
         psimpl::simplify_lang <DIM> (
             polyline.begin (), polyline.end (), tol, lookAhead,
             std::back_inserter (result));
@@ -513,7 +514,7 @@ namespace psimpl {
         // invalid input
         VERIFY_TRUE(
             std::distance (
-                result, 
+                result,
                 psimpl::simplify_lang <DIM> (
                     polyline, polyline + count*DIM, 0, 0,
                     result))
@@ -522,7 +523,7 @@ namespace psimpl {
         // valid input
         VERIFY_TRUE(
             std::distance (
-                result, 
+                result,
                 psimpl::simplify_lang <DIM> (
                     polyline, polyline + count*DIM, 10.f, 10,
                     result))
@@ -532,7 +533,7 @@ namespace psimpl {
     void TestLang::TestIntegers () {
         const unsigned DIM = 3;
         const double tol = 3;
-        const short look_ahead = 7;
+        const int look_ahead = 7;
 
         std::vector <double> polyline, expected, rexpected;
         std::generate_n (std::back_inserter (polyline), 100*DIM, SquareToothLine <double, DIM> ());
@@ -545,38 +546,17 @@ namespace psimpl {
         psimpl::simplify_lang <DIM> (
                     polyline.rbegin (), polyline.rend (),
                     tol, look_ahead, std::back_inserter (rexpected));
-        {
-            // integers
-            std::vector <int> intPolyline, intResult, intExpected;
-            std::copy (polyline.begin (), polyline.end (), std::back_inserter (intPolyline));
-            std::copy (expected.begin (), expected.end (), std::back_inserter (intExpected));
-            // simplify -> result should match expected
-            psimpl::simplify_lang <DIM> (
-                        intPolyline.begin (), intPolyline.end (),
-                        tol, look_ahead, std::back_inserter (intResult));
-            VERIFY_TRUE(intResult == intExpected);
-        }
-        {
-            // unsigned integers
-            std::vector <unsigned> uintPolyline, uintResult, uintExpected;
-            std::copy (polyline.begin (), polyline.end (), std::back_inserter (uintPolyline));
-            std::copy (expected.begin (), expected.end (), std::back_inserter (uintExpected));
-            // simplify -> result should match expected
-            psimpl::simplify_lang <DIM> (
-                        uintPolyline.begin (), uintPolyline.end (),
-                        tol, look_ahead, std::back_inserter (uintResult));
-            VERIFY_TRUE(uintResult == uintExpected);
-        }
-        {
-            // unsigned integers (reverse)
-            std::vector <unsigned> uintPolyline, ruintResult, ruintExpected;
-            std::copy (polyline.begin (), polyline.end (), std::back_inserter (uintPolyline));
-            std::copy (rexpected.begin (), rexpected.end (), std::back_inserter (ruintExpected));
-            // simplify reverse -> result should match rexpected
-            psimpl::simplify_lang <DIM> (
-                        uintPolyline.rbegin (), uintPolyline.rend (),
-                        tol, look_ahead, std::back_inserter (ruintResult));
-            VERIFY_TRUE(ruintResult == ruintExpected);
-        }
-    }    
+
+        // Use the helper function to test integer conversions with look_ahead parameter
+        TestIntegerConversionWithRepeat<DIM>(
+            polyline, expected, rexpected,
+            [](auto first, auto last, auto tolerance, auto lookAhead, auto output) {
+                return psimpl::simplify_lang<DIM>(
+                    first, last, tolerance, lookAhead, output);
+            },
+            tol,
+            look_ahead,
+            "TestLang::TestIntegers"
+        );
+    }
 }}
